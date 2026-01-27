@@ -48,26 +48,26 @@ fun AppRoot() {
 
             composable(Routes.HOME) {
                 HomeScreen(
-                    onOpenEditor = {
-                        navController.navigate(Routes.EDITOR)
-                    }
+                    onOpenEditor = { navController.navigate(Routes.EDITOR) },
+                    onOpenSearch = { navController.navigate(Routes.SEARCH) },
+                    onOpenSettings = { navController.navigate(Routes.SETTINGS) }
                 )
             }
 
+
             composable(Routes.EDITOR) {
                 EditorScreen(
-                    onBack = {
-                        navController.popBackStack()
-                    }
+                    onBack = { navController.popBackStack() }
                 )
             }
+
 
             composable(Routes.SEARCH) {
                 SearchScreen()
             }
 
             composable(Routes.SETTINGS) {
-                SettingsScreen()
+                SettingsScreen(onBack = { navController.popBackStack() })
             }
 
             composable(Routes.SECURITY) {
