@@ -32,7 +32,6 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-
 @Composable
 fun AppRoot() {
     val navController = rememberNavController()
@@ -40,16 +39,45 @@ fun AppRoot() {
     Scaffold(
         modifier = Modifier.fillMaxSize()
     ) { innerPadding ->
+
         NavHost(
             navController = navController,
             startDestination = Routes.HOME,
             modifier = Modifier.padding(innerPadding)
         ) {
-            composable(Routes.HOME) { HomeScreen() }
-            composable(Routes.EDITOR) { EditorScreen() }
-            composable(Routes.SEARCH) { SearchScreen() }
-            composable(Routes.SETTINGS) { SettingsScreen() }
-            composable(Routes.SECURITY) { SecurityGateScreen() }
+
+            composable(Routes.HOME) {
+                HomeScreen(
+                    onOpenEditor = {
+                        navController.navigate(Routes.EDITOR)
+                    }
+                )
+            }
+
+            composable(Routes.EDITOR) {
+                EditorScreen(
+                    onBack = {
+                        navController.popBackStack()
+                    }
+                )
+            }
+
+            composable(Routes.SEARCH) {
+                SearchScreen()
+            }
+
+            composable(Routes.SETTINGS) {
+                SettingsScreen()
+            }
+
+            composable(Routes.SECURITY) {
+                SecurityGateScreen(
+                    onOpenEditor = {
+                        navController.navigate(Routes.EDITOR)
+                    }
+                )
+            }
         }
     }
 }
+

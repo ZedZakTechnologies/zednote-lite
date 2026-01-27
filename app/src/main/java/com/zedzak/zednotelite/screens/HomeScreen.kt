@@ -6,7 +6,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.foundation.layout.padding
 
 @Composable
-fun HomeScreen(modifier: Modifier = Modifier) {
-    Text(text = "Home Screen", modifier = modifier)
+fun HomeScreen(
+    modifier: Modifier = Modifier,
+    onOpenEditor: () -> Unit = {}
+) {
+    Text(
+        text = "Home Screen",
+        modifier = modifier
+    )
 }
 
