@@ -50,7 +50,8 @@ fun AppRoot() {
                 HomeScreen(
                     onOpenEditor = { navController.navigate(Routes.EDITOR) },
                     onOpenSearch = { navController.navigate(Routes.SEARCH) },
-                    onOpenSettings = { navController.navigate(Routes.SETTINGS) }
+                    onOpenSettings = { navController.navigate(Routes.SETTINGS) },
+                    onOpenSettingGate = { navController.navigate(Routes.SECURITY) }
                 )
             }
 
@@ -71,12 +72,9 @@ fun AppRoot() {
             }
 
             composable(Routes.SECURITY) {
-                SecurityGateScreen(
-                    onOpenEditor = {
-                        navController.navigate(Routes.EDITOR)
-                    }
-                )
+                SecurityGateScreen(onBack = { navController.popBackStack() })
             }
+
         }
     }
 }

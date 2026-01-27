@@ -18,7 +18,8 @@ fun HomeScreen(
     modifier: Modifier = Modifier,
     onOpenEditor: () -> Unit,
     onOpenSearch: () -> Unit,
-    onOpenSettings: () -> Unit
+    onOpenSettings: () -> Unit,
+    onOpenSettingGate: () -> Unit,
 ) {
     Column(
         modifier = modifier
@@ -42,6 +43,13 @@ fun HomeScreen(
         Button(onClick = onOpenSettings) {
             Text("Settings")
         }
+
+        Button(onClick = onOpenSettingGate) {
+            Text("Security Gate")
+        }
+
+
+
     }
 }
 
