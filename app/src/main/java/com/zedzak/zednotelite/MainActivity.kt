@@ -20,7 +20,6 @@ import com.zedzak.zednotelite.navigation.Routes
 import com.zedzak.zednotelite.screens.*
 import androidx.navigation.NavType
 import androidx.navigation.navArgument
-import com.zedzak.zednotelite.state.AppState
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.zedzak.zednotelite.viewmodel.NotesViewModel
 

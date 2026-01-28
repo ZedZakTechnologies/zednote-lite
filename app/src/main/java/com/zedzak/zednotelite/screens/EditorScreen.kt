@@ -15,7 +15,6 @@ import androidx.compose.runtime.setValue
 import java.util.UUID
 import com.zedzak.zednotelite.data.NotesRepository
 import com.zedzak.zednotelite.model.Note
-import com.zedzak.zednotelite.state.AppState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import com.zedzak.zednotelite.viewmodel.NotesViewModel
@@ -77,28 +76,4 @@ fun EditorScreen(
 }
 
 
-private fun saveNote(title: String, content: String) {
-    val now = System.currentTimeMillis()
 
-    val note = AppState.currentNote
-    if (note == null) {
-        NotesRepository.addNote(
-            Note(
-                id = UUID.randomUUID().toString(),
-                title = title,
-                content = content,
-                lastUpdated = now
-            )
-        )
-    } else {
-        NotesRepository.updateNote(
-            note.copy(
-                title = title,
-                content = content,
-                lastUpdated = now
-            )
-        )
-    }
-
-    AppState.clearCurrentNote()
-}
