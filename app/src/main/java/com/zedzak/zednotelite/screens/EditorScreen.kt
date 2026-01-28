@@ -12,23 +12,35 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
+import java.util.UUID
+import com.zedzak.zednotelite.data.NotesRepository
+import com.zedzak.zednotelite.model.Note
+import com.zedzak.zednotelite.state.AppState
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EditorScreen(
     modifier: Modifier = Modifier,
-    onBack: () -> Unit = {}
+    onBack: () -> Unit
 ) {
+    val note = AppState.currentNote
+
+    var title by remember { mutableStateOf(note?.title ?: "") }
+    var content by remember { mutableStateOf(note?.content ?: "") }
+
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("New Note") },
+                title = { Text(text = "Edit Note") },
                 navigationIcon = {
-                    IconButton(onClick = onBack) {
+                    IconButton(onClick = {
+                        saveNote(title, content)
+                        onBack()
+                    }) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = "Back"
                         )
-
                     }
                 }
             )
@@ -38,17 +50,51 @@ fun EditorScreen(
             modifier = modifier
                 .fillMaxSize()
                 .padding(innerPadding)
-                .padding(16.dp)
+                .padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            var text by remember { mutableStateOf("") }
-
             OutlinedTextField(
-                value = text,
-                onValueChange = { text = it },
-                modifier = Modifier.fillMaxSize(),
-                placeholder = { Text("Start writing…") }
+                value = title,
+                onValueChange = { title = it },
+                placeholder = { Text("Title") },
+                modifier = Modifier.fillMaxWidth()
             )
 
+            OutlinedTextField(
+                value = content,
+                onValueChange = { content = it },
+                placeholder = { Text("Write your note…") },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f)
+            )
         }
     }
+}
+
+
+private fun saveNote(title: String, content: String) {
+    val now = System.currentTimeMillis()
+
+    val note = AppState.currentNote
+    if (note == null) {
+        NotesRepository.addNote(
+            Note(
+                id = UUID.randomUUID().toString(),
+                title = title,
+                content = content,
+                lastUpdated = now
+            )
+        )
+    } else {
+        NotesRepository.updateNote(
+            note.copy(
+                title = title,
+                content = content,
+                lastUpdated = now
+            )
+        )
+    }
+
+    AppState.clearCurrentNote()
 }

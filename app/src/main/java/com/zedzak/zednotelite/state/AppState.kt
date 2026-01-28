@@ -17,6 +17,9 @@ object AppState {
     var activeNoteId by mutableStateOf<String?>(null)
         private set
 
+    var currentNote: Note? = null
+        private set
+
     init {
         // initial load
         notes.addAll(NotesRepository.getAllNotes())
@@ -34,17 +37,21 @@ object AppState {
         activeNoteId = note.id
     }
 
+
     fun openNote(noteId: String) {
-        activeNoteId = noteId
+        currentNote = NotesRepository.getNoteById(noteId)
     }
 
-    fun updateNote(updated: Note) {
-        NotesRepository.updateNote(updated)
+    fun createNote(note: Note) {
+        NotesRepository.addNote(note)
+    }
 
-        val index = notes.indexOfFirst { it.id == updated.id }
-        if (index != -1) {
-            notes[index] = updated
-        }
+    fun updateNote(note: Note) {
+        NotesRepository.updateNote(note)
+    }
+
+    fun clearCurrentNote() {
+        currentNote = null
     }
 
     fun getActiveNote(): Note? {
