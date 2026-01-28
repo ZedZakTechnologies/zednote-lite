@@ -10,18 +10,16 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.zedzak.zednotelite.data.NotesRepository
 import com.zedzak.zednotelite.model.Note
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.*
-import androidx.compose.runtime.remember
-import androidx.compose.ui.unit.dp
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import com.zedzak.zednotelite.viewmodel.NotesViewModel
+import com.zedzak.zednotelite.ui.viewmodel.NotesViewModel
+
 
 
 

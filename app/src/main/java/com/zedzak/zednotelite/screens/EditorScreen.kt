@@ -12,12 +12,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
-import java.util.UUID
-import com.zedzak.zednotelite.data.NotesRepository
-import com.zedzak.zednotelite.model.Note
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import com.zedzak.zednotelite.viewmodel.NotesViewModel
+import com.zedzak.zednotelite.ui.viewmodel.NotesViewModel
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

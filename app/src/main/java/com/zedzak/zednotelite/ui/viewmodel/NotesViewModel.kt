@@ -1,13 +1,16 @@
-package com.zedzak.zednotelite.viewmodel
+package com.zedzak.zednotelite.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
-import com.zedzak.zednotelite.data.NotesRepository
+import com.zedzak.zednotelite.data.InMemoryNotesRepository
+import com.zedzak.zednotelite.data.NotesDataSource
 import com.zedzak.zednotelite.model.Note
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import java.util.UUID
 
-class NotesViewModel : ViewModel() {
+class NotesViewModel(
+    private val repository: NotesDataSource = InMemoryNotesRepository()
+) : ViewModel() {
 
     private val _notes = MutableStateFlow<List<Note>>(emptyList())
     val notes: StateFlow<List<Note>> = _notes
@@ -20,7 +23,7 @@ class NotesViewModel : ViewModel() {
     }
 
     private fun loadNotes() {
-        _notes.value = NotesRepository.getAllNotes()
+        _notes.value = repository.getAllNotes()
     }
 
     fun createNewNote(): Note {
@@ -30,14 +33,14 @@ class NotesViewModel : ViewModel() {
             content = "",
             lastUpdated = System.currentTimeMillis()
         )
-        NotesRepository.addNote(note)
+        repository.addNote(note)
         loadNotes()
         _activeNote.value = note
         return note
     }
 
     fun openNote(noteId: String) {
-        _activeNote.value = NotesRepository.getNoteById(noteId)
+        _activeNote.value = repository.getNoteById(noteId)
     }
 
     fun saveNote(title: String, content: String) {
@@ -45,15 +48,16 @@ class NotesViewModel : ViewModel() {
         val current = _activeNote.value
 
         if (current == null) {
-            val note = Note(
-                id = UUID.randomUUID().toString(),
-                title = title,
-                content = content,
-                lastUpdated = now
+            repository.addNote(
+                Note(
+                    id = UUID.randomUUID().toString(),
+                    title = title,
+                    content = content,
+                    lastUpdated = now
+                )
             )
-            NotesRepository.addNote(note)
         } else {
-            NotesRepository.updateNote(
+            repository.updateNote(
                 current.copy(
                     title = title,
                     content = content,
@@ -63,10 +67,6 @@ class NotesViewModel : ViewModel() {
         }
 
         loadNotes()
-        _activeNote.value = null
-    }
-
-    fun clearActiveNote() {
         _activeNote.value = null
     }
 }

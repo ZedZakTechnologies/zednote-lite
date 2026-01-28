@@ -21,7 +21,7 @@ import com.zedzak.zednotelite.screens.*
 import androidx.navigation.NavType
 import androidx.navigation.navArgument
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.zedzak.zednotelite.viewmodel.NotesViewModel
+import com.zedzak.zednotelite.ui.viewmodel.NotesViewModel
 
 
 class MainActivity : ComponentActivity() {
