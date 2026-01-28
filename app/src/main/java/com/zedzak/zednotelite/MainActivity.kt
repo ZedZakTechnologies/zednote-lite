@@ -18,6 +18,9 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.zedzak.zednotelite.navigation.Routes
 import com.zedzak.zednotelite.screens.*
+import androidx.navigation.NavType
+import androidx.navigation.navArgument
+import com.zedzak.zednotelite.state.AppState
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -62,6 +65,17 @@ fun AppRoot() {
                 )
             }
 
+            composable(
+                route = Routes.EDITOR_WITH_ID,
+                arguments = listOf(navArgument("noteId") { type = NavType.StringType })
+            ) { backStackEntry ->
+                val noteId = backStackEntry.arguments?.getString("noteId")
+                noteId?.let { AppState.openNote(it) }
+
+                EditorScreen(
+                    onBack = { navController.popBackStack() }
+                )
+            }
 
             composable(Routes.SEARCH) {
                 SearchScreen()
