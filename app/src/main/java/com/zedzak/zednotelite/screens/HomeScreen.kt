@@ -19,20 +19,24 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.*
 import androidx.compose.runtime.remember
 import androidx.compose.ui.unit.dp
-
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import com.zedzak.zednotelite.viewmodel.NotesViewModel
 
 
 
 @Composable
 fun HomeScreen(
     modifier: Modifier = Modifier,
+    viewModel: NotesViewModel,
     onOpenEditor: () -> Unit,
     onOpenSearch: () -> Unit,
     onOpenSettings: () -> Unit,
     onOpenSettingGate: () -> Unit,
     onOpenNote: (String) -> Unit
 ) {
-    val notes = remember { NotesRepository.getAllNotes() }
+    val notes by viewModel.notes.collectAsState()
+
 
     Column(
         modifier = modifier

@@ -16,17 +16,21 @@ import java.util.UUID
 import com.zedzak.zednotelite.data.NotesRepository
 import com.zedzak.zednotelite.model.Note
 import com.zedzak.zednotelite.state.AppState
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import com.zedzak.zednotelite.viewmodel.NotesViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EditorScreen(
     modifier: Modifier = Modifier,
+    viewModel: NotesViewModel,
     onBack: () -> Unit
 ) {
-    val note = AppState.currentNote
+    val note by viewModel.activeNote.collectAsState()
 
-    var title by remember { mutableStateOf(note?.title ?: "") }
-    var content by remember { mutableStateOf(note?.content ?: "") }
+    var title by remember(note?.id) { mutableStateOf(note?.title ?: "") }
+    var content by remember(note?.id) { mutableStateOf(note?.content ?: "") }
 
     Scaffold(
         topBar = {
@@ -34,7 +38,7 @@ fun EditorScreen(
                 title = { Text(text = "Edit Note") },
                 navigationIcon = {
                     IconButton(onClick = {
-                        saveNote(title, content)
+                        viewModel.saveNote(title, content)
                         onBack()
                     }) {
                         Icon(

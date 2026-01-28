@@ -21,6 +21,9 @@ import com.zedzak.zednotelite.screens.*
 import androidx.navigation.NavType
 import androidx.navigation.navArgument
 import com.zedzak.zednotelite.state.AppState
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.zedzak.zednotelite.viewmodel.NotesViewModel
+
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -38,6 +41,7 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun AppRoot() {
     val navController = rememberNavController()
+    val notesViewModel: NotesViewModel = viewModel()
 
     Scaffold(
         modifier = Modifier.fillMaxSize()
@@ -51,19 +55,27 @@ fun AppRoot() {
 
             composable(Routes.HOME) {
                 HomeScreen(
-                    onOpenEditor = { navController.navigate(Routes.EDITOR) },
+                    viewModel = notesViewModel,
+                    onOpenEditor = {
+                        notesViewModel.createNewNote()
+                        navController.navigate(Routes.EDITOR)
+                    },
                     onOpenSearch = { navController.navigate(Routes.SEARCH) },
                     onOpenSettings = { navController.navigate(Routes.SETTINGS) },
                     onOpenSettingGate = { navController.navigate(Routes.SECURITY) },
                     onOpenNote = { noteId ->
+                        notesViewModel.openNote(noteId)
                         navController.navigate(Routes.editorWithId(noteId))
                     }
                 )
             }
 
 
+
+
             composable(Routes.EDITOR) {
                 EditorScreen(
+                    viewModel = notesViewModel,
                     onBack = { navController.popBackStack() }
                 )
             }
@@ -73,12 +85,15 @@ fun AppRoot() {
                 arguments = listOf(navArgument("noteId") { type = NavType.StringType })
             ) { backStackEntry ->
                 val noteId = backStackEntry.arguments?.getString("noteId")
-                noteId?.let { AppState.openNote(it) }
+                noteId?.let { notesViewModel.openNote(it) }
 
                 EditorScreen(
+                    viewModel = notesViewModel,
                     onBack = { navController.popBackStack() }
                 )
             }
+
+
 
             composable(Routes.SEARCH) {
                 SearchScreen()
