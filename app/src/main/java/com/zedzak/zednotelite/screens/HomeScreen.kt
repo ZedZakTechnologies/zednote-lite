@@ -10,6 +10,16 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.zedzak.zednotelite.data.NotesRepository
+import com.zedzak.zednotelite.model.Note
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.*
+import androidx.compose.runtime.remember
+import androidx.compose.ui.unit.dp
+
 
 
 
@@ -20,7 +30,10 @@ fun HomeScreen(
     onOpenSearch: () -> Unit,
     onOpenSettings: () -> Unit,
     onOpenSettingGate: () -> Unit,
+    onOpenNote: (String) -> Unit
 ) {
+    val notes = remember { NotesRepository.getAllNotes() }
+
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -48,9 +61,41 @@ fun HomeScreen(
             Text("Security Gate")
         }
 
-
+        LazyColumn(
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            items(notes) { note ->
+                NoteRow(
+                    note = note,
+                    onClick = { onOpenNote(note.id) }
+                )
+            }
+        }
 
     }
 }
 
 
+@Composable
+fun NoteRow(
+    note: Note,
+    onClick: () -> Unit
+) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable(onClick = onClick)
+    ) {
+        Column(modifier = Modifier.padding(12.dp)) {
+            Text(
+                text = note.title,
+                style = MaterialTheme.typography.titleMedium
+            )
+            Spacer(modifier = Modifier.height(4.dp))
+            Text(
+                text = note.content.take(80),
+                style = MaterialTheme.typography.bodyMedium
+            )
+        }
+    }
+}

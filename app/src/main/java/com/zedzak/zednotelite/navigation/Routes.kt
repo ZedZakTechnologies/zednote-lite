@@ -7,4 +7,9 @@ object Routes {
     const val SEARCH = "search"
     const val SETTINGS = "settings"
     const val SECURITY = "security"
+    fun editorWithId(noteId: String): String {
+        return "editor/$noteId"
+    }
 }
+
+

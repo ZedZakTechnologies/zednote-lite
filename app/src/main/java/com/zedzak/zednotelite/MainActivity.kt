@@ -54,7 +54,10 @@ fun AppRoot() {
                     onOpenEditor = { navController.navigate(Routes.EDITOR) },
                     onOpenSearch = { navController.navigate(Routes.SEARCH) },
                     onOpenSettings = { navController.navigate(Routes.SETTINGS) },
-                    onOpenSettingGate = { navController.navigate(Routes.SECURITY) }
+                    onOpenSettingGate = { navController.navigate(Routes.SECURITY) },
+                    onOpenNote = { noteId ->
+                        navController.navigate(Routes.editorWithId(noteId))
+                    }
                 )
             }
 
