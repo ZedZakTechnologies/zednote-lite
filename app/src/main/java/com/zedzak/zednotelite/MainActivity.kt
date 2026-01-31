@@ -97,8 +97,6 @@ fun AppRoot() {
             }
 
 
-
-
             composable(Routes.EDITOR) {
                 EditorScreen(
                     viewModel = notesViewModel,
