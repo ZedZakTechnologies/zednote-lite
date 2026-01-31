@@ -12,7 +12,9 @@ interface NotesDataSource {
 
     suspend fun updateNote(note: Note)
 
-    suspend fun deleteNote(note: Note)
+
+    suspend fun deleteNote(id: String)
+
 }
 
 

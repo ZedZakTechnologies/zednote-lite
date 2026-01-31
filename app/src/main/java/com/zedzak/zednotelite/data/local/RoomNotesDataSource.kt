@@ -21,7 +21,8 @@ class RoomNotesDataSource(
         dao.updateNote(note.toEntity())
     }
 
-    override suspend fun deleteNote(note: Note) {
-        dao.deleteNote(note.toEntity())
+    override suspend fun deleteNote(id: String) {
+        dao.deleteNoteById(id.toLong())
     }
+
 }

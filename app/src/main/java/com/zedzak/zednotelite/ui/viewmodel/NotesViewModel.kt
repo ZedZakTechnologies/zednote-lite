@@ -85,5 +85,13 @@ class NotesViewModel(
         }
     }
 
+    fun deleteNote(noteId: String) {
+        viewModelScope.launch {
+            repository.deleteNote(noteId)
+            _activeNote.value = null
+            loadNotes()
+        }
+    }
+
 
 }
