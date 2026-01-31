@@ -30,7 +30,7 @@ class NotesViewModel(
     }
 
 
-
+// Called when starting a brand new note (no ID yet)
     fun openNote(noteId: String) {
         viewModelScope.launch {
             _activeNote.value = repository.getNoteById(noteId)
@@ -49,6 +49,7 @@ class NotesViewModel(
         return note
     }
 
+    // Called when starting a brand new note (no ID yet)
     fun startNewNote() {
         _activeNote.value = null
     }

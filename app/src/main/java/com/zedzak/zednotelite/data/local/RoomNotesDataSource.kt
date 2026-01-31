@@ -6,7 +6,7 @@ import com.zedzak.zednotelite.model.Note
 class RoomNotesDataSource(
     private val dao: NoteDao
 ) : NotesDataSource {
-
+// Maps Room entities to domain models
     override suspend fun getAllNotes(): List<Note> =
         dao.getAllNotes().map { it.toNote() }
 
