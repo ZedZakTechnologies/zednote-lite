@@ -2,7 +2,7 @@ package com.zedzak.zednotelite.data.local
 
 import android.content.Context
 import androidx.room.Room
-import com.zedzak.zednotelite.data.local.AppDatabase
+
 
 object DatabaseProvider {
 

@@ -34,7 +34,9 @@ fun HomeScreen(
     onOpenNote: (String) -> Unit
 ) {
     val notes by viewModel.notes.collectAsState()
-
+    val visibleNotes = notes.filter {
+        it.title.isNotBlank() || it.content.isNotBlank()
+    }
 
     Column(
         modifier = modifier

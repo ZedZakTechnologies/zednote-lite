@@ -6,6 +6,7 @@ import com.zedzak.zednotelite.data.local.NoteEntity
 import com.zedzak.zednotelite.data.local.NoteDao
 
 
+
 @Database(
     entities = [NoteEntity::class],
     version = 1,

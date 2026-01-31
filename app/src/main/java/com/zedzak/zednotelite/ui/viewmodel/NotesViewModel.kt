@@ -1,15 +1,16 @@
 package com.zedzak.zednotelite.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
-import com.zedzak.zednotelite.data.InMemoryNotesRepository
+import androidx.lifecycle.viewModelScope
 import com.zedzak.zednotelite.data.NotesDataSource
 import com.zedzak.zednotelite.model.Note
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.launch
 import java.util.UUID
 
 class NotesViewModel(
-    private val repository: NotesDataSource = InMemoryNotesRepository()
+    private val repository: NotesDataSource
 ) : ViewModel() {
 
     private val _notes = MutableStateFlow<List<Note>>(emptyList())
@@ -23,7 +24,17 @@ class NotesViewModel(
     }
 
     private fun loadNotes() {
-        _notes.value = repository.getAllNotes()
+        viewModelScope.launch {
+            _notes.value = repository.getAllNotes()
+        }
+    }
+
+
+
+    fun openNote(noteId: String) {
+        viewModelScope.launch {
+            _activeNote.value = repository.getNoteById(noteId)
+        }
     }
 
     fun createNewNote(): Note {
@@ -33,40 +44,46 @@ class NotesViewModel(
             content = "",
             lastUpdated = System.currentTimeMillis()
         )
-        repository.addNote(note)
-        loadNotes()
+
         _activeNote.value = note
         return note
     }
 
-    fun openNote(noteId: String) {
-        _activeNote.value = repository.getNoteById(noteId)
+    fun startNewNote() {
+        _activeNote.value = null
     }
-
     fun saveNote(title: String, content: String) {
-        val now = System.currentTimeMillis()
-        val current = _activeNote.value
+        if (title.isBlank() && content.isBlank()) {
+            return // do nothing
+        }
 
-        if (current == null) {
-            repository.addNote(
-                Note(
+        viewModelScope.launch {
+            val current = _activeNote.value
+
+            if (current == null) {
+                // Create
+                val note = Note(
                     id = UUID.randomUUID().toString(),
                     title = title,
                     content = content,
-                    lastUpdated = now
+                    lastUpdated = System.currentTimeMillis()
                 )
-            )
-        } else {
-            repository.updateNote(
-                current.copy(
+                repository.addNote(note)
+                _activeNote.value = note
+            } else {
+                // Update
+                val updated = current.copy(
                     title = title,
                     content = content,
-                    lastUpdated = now
+                    lastUpdated = System.currentTimeMillis()
                 )
-            )
-        }
+                repository.updateNote(updated)
+                _activeNote.value = updated
+            }
 
-        loadNotes()
-        _activeNote.value = null
+            loadNotes()
+        }
     }
+
+
 }

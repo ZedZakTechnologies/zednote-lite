@@ -22,6 +22,17 @@ import androidx.navigation.navArgument
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.zedzak.zednotelite.ui.viewmodel.NotesViewModel
 
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.compose.ui.platform.LocalContext
+import com.zedzak.zednotelite.data.NotesDataSource
+
+import com.zedzak.zednotelite.data.local.DatabaseProvider
+import com.zedzak.zednotelite.data.local.RoomNotesDataSource
+import com.zedzak.zednotelite.data.local.RoomNotesRepository
+
+
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -37,8 +48,26 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun AppRoot() {
+    Text("AppRoot reached")
     val navController = rememberNavController()
-    val notesViewModel: NotesViewModel = viewModel()
+    val context = LocalContext.current
+
+    val notesViewModel: NotesViewModel = viewModel(
+        factory = object : ViewModelProvider.Factory {
+            override fun <T : ViewModel> create(modelClass: Class<T>): T {
+                val dao = DatabaseProvider
+                    .getDatabase(context)
+                    .noteDao()
+
+                @Suppress("UNCHECKED_CAST")
+                return NotesViewModel(
+                    repository = RoomNotesDataSource(dao)
+                ) as T
+            }
+        }
+    )
+
+
 
     Scaffold(
         modifier = Modifier.fillMaxSize()
@@ -54,7 +83,7 @@ fun AppRoot() {
                 HomeScreen(
                     viewModel = notesViewModel,
                     onOpenEditor = {
-                        notesViewModel.createNewNote()
+                        notesViewModel.startNewNote()
                         navController.navigate(Routes.EDITOR)
                     },
                     onOpenSearch = { navController.navigate(Routes.SEARCH) },
