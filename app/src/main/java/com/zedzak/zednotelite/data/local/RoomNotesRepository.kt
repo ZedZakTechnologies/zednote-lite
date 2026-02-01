@@ -8,14 +8,7 @@ class RoomNotesRepository(
         return dao.getAllNotes()
     }
 
-    override suspend fun addNote(title: String, content: String) {
-        dao.insertNote(
-            NoteEntity(
-                title = title,
-                content = content
-            )
-        )
-    }
+
 
     override suspend fun deleteNote(note: NoteEntity) {
         dao.deleteNote(note)

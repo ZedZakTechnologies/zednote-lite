@@ -5,11 +5,11 @@ import androidx.room.PrimaryKey
 
 @Entity(tableName = "notes")
 data class NoteEntity(
-    @PrimaryKey(autoGenerate = true)
-    val id: Long = 0,
+    @PrimaryKey
+    val id: String,
     val title: String,
     val content: String,
-    val createdAt: Long = System.currentTimeMillis()
+    val lastUpdated: Long
 )
 
 
@@ -17,13 +17,13 @@ fun NoteEntity.toNote() = Note(
     id = id.toString(),
     title = title,
     content = content,
-    lastUpdated = createdAt
+    lastUpdated = lastUpdated
 )
 
 fun Note.toEntity() = NoteEntity(
-    id = id.toLongOrNull() ?: 0L,
+    id = id,
     title = title,
     content = content,
-    createdAt = lastUpdated
+    lastUpdated = lastUpdated
 )
 

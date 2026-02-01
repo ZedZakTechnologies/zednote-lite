@@ -9,11 +9,11 @@ import androidx.room.OnConflictStrategy
 @Dao
 interface NoteDao {
 
-    @Query("SELECT * FROM notes ORDER BY createdAt DESC")
+    @Query("SELECT * FROM notes ORDER BY lastUpdated DESC")
     suspend fun getAllNotes(): List<NoteEntity>
 
     @Query("SELECT * FROM notes WHERE id = :id LIMIT 1")
-    suspend fun getNoteById(id: Long): NoteEntity?
+    suspend fun getNoteById(id: String): NoteEntity?
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertNote(note: NoteEntity)
@@ -24,8 +24,8 @@ interface NoteDao {
     @Delete
     suspend fun deleteNote(note: NoteEntity)
 
-    @Query("DELETE FROM notes WHERE id = :id")
-    suspend fun deleteNoteById(id: Long)
+    //@Query("DELETE FROM notes WHERE id = :id")
+    //suspend fun deleteNoteById(id)
 
 }
 

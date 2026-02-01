@@ -6,7 +6,6 @@ interface NotesRepository {
 
     suspend fun getNotes(): List<NoteEntity>
 
-    suspend fun addNote(title: String, content: String)
 
     suspend fun deleteNote(note: NoteEntity)
 }

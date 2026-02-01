@@ -48,7 +48,6 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun AppRoot() {
-    Text("AppRoot reached")
     val navController = rememberNavController()
     val context = LocalContext.current
 
@@ -83,53 +82,28 @@ fun AppRoot() {
                 HomeScreen(
                     viewModel = notesViewModel,
                     onOpenEditor = {
-                        notesViewModel.startNewNote()
-                        navController.navigate(Routes.EDITOR)
+                        notesViewModel.startNewNote { id ->
+                            navController.navigate(Routes.editor(id))
+                        }
                     },
-                    onOpenSearch = { navController.navigate(Routes.SEARCH) },
-                    onOpenSettings = { navController.navigate(Routes.SETTINGS) },
-                    onOpenSettingGate = { navController.navigate(Routes.SECURITY) },
                     onOpenNote = { noteId ->
-                        notesViewModel.openNote(noteId)
-                        navController.navigate(Routes.editorWithId(noteId))
+                        navController.navigate(Routes.editor(noteId))
                     }
                 )
             }
 
-
-            composable(Routes.EDITOR) {
-                EditorScreen(
-                    viewModel = notesViewModel,
-                    onBack = { navController.popBackStack() }
-                )
-            }
-
             composable(
-                route = Routes.EDITOR_WITH_ID,
-                arguments = listOf(navArgument("noteId") { type = NavType.StringType })
-            ) { backStackEntry ->
-                val noteId = backStackEntry.arguments?.getString("noteId")
-                noteId?.let { notesViewModel.openNote(it) }
-
+                route = Routes.EDITOR,
+                arguments = listOf(
+                    navArgument("noteId") { type = NavType.StringType }
+                )
+            ) {
                 EditorScreen(
                     viewModel = notesViewModel,
                     onBack = { navController.popBackStack() }
                 )
             }
 
-
-
-            composable(Routes.SEARCH) {
-                SearchScreen()
-            }
-
-            composable(Routes.SETTINGS) {
-                SettingsScreen(onBack = { navController.popBackStack() })
-            }
-
-            composable(Routes.SECURITY) {
-                SecurityGateScreen(onBack = { navController.popBackStack() })
-            }
 
         }
     }

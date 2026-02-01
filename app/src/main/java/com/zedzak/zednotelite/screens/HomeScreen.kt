@@ -25,18 +25,52 @@ import com.zedzak.zednotelite.ui.viewmodel.NotesViewModel
 
 @Composable
 fun HomeScreen(
-    modifier: Modifier = Modifier,
     viewModel: NotesViewModel,
     onOpenEditor: () -> Unit,
-    onOpenSearch: () -> Unit,
-    onOpenSettings: () -> Unit,
-    onOpenSettingGate: () -> Unit,
-    onOpenNote: (String) -> Unit
-) {
+    onOpenNote: (String) -> Unit,
+    modifier: Modifier = Modifier
+)  {
     val notes by viewModel.notes.collectAsState()
     val visibleNotes = notes.filter {
         it.title.isNotBlank() || it.content.isNotBlank()
     }
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .padding(16.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp)
+    ) {
+        Text(
+            text = "ZedNote Lite",
+            style = MaterialTheme.typography.titleLarge
+        )
+
+        Button(
+            onClick = onOpenEditor,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text("New Note")
+        }
+
+        if (notes.isEmpty()) {
+            Text(
+                text = "No notes yet",
+                style = MaterialTheme.typography.bodyMedium
+            )
+        } else {
+            LazyColumn(
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                items(notes) { note ->
+                    NoteRow(
+                        note = note,
+                        onClick = { onOpenNote(note.id) }
+                    )
+                }
+            }
+        }
+    }
+
 
     Column(
         modifier = modifier
@@ -53,17 +87,9 @@ fun HomeScreen(
             Text("New Note")
         }
 
-        Button(onClick = onOpenSearch) {
-            Text("Search Notes")
-        }
 
-        Button(onClick = onOpenSettings) {
-            Text("Settings")
-        }
 
-        Button(onClick = onOpenSettingGate) {
-            Text("Security Gate")
-        }
+
 
         LazyColumn(
             verticalArrangement = Arrangement.spacedBy(8.dp)

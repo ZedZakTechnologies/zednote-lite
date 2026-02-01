@@ -8,6 +8,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import java.util.UUID
+import com.zedzak.zednotelite.data.local.toEntity
 
 class NotesViewModel(
     private val repository: NotesDataSource
@@ -50,9 +51,15 @@ class NotesViewModel(
     }
 
     // Called when starting a brand new note (no ID yet)
-    fun startNewNote() {
-        _activeNote.value = null
+    fun startNewNote(onCreated: (String) -> Unit) {
+        viewModelScope.launch {
+            val id = repository.createNote()
+            openNote(id)
+            onCreated(id)
+        }
     }
+
+
     fun saveNote(title: String, content: String) {
         if (title.isBlank() && content.isBlank()) {
             return // do nothing
@@ -86,13 +93,14 @@ class NotesViewModel(
         }
     }
 
-    fun deleteNote(noteId: String) {
+    fun deleteNote(note: Note) {
         viewModelScope.launch {
-            repository.deleteNote(noteId)
+            repository.deleteNote(note)
             _activeNote.value = null
             loadNotes()
         }
     }
+
 
 
 }
