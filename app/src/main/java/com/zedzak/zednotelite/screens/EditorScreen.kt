@@ -13,8 +13,21 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import com.zedzak.zednotelite.ui.viewmodel.NotesViewModel
 import com.zedzak.zednotelite.model.Note
+import androidx.compose.runtime.remember
+
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
+
+
+import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.ui.text.style.TextAlign
+
+
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -27,6 +40,24 @@ fun EditorScreen(
 
     val title = activeNote?.title.orEmpty()
     val content = activeNote?.content.orEmpty()
+
+
+
+
+    val wordCount by remember(content) {
+        derivedStateOf {
+            content
+                .trim()
+                .split(Regex("\\s+"))
+                .filter { it.isNotBlank() }
+                .size
+        }
+    }
+
+    val charCount by remember(content) {
+        derivedStateOf { content.length }
+    }
+
 
 
     Scaffold(
@@ -76,13 +107,32 @@ fun EditorScreen(
                         )
                     }
                 },
-                placeholder = { Text("Write your note…") }
+                placeholder = { Text("Write your note…") },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f)
+
             )
+            Text(
+                text = "$wordCount words · $charCount chars",
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 4.dp),
+                textAlign = TextAlign.End
+            )
+
+
+
 
 
 
         }
     }
+
+
+
 }
 
 
