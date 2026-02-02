@@ -43,7 +43,7 @@ class NotesViewModel(
             id = UUID.randomUUID().toString(),
             title = "",
             content = "",
-            lastUpdated = System.currentTimeMillis()
+            lastEditedAt = System.currentTimeMillis()
         )
 
         _activeNote.value = note
@@ -74,7 +74,7 @@ class NotesViewModel(
                     id = UUID.randomUUID().toString(),
                     title = title,
                     content = content,
-                    lastUpdated = System.currentTimeMillis()
+                    lastEditedAt = System.currentTimeMillis()
                 )
                 repository.addNote(note)
                 _activeNote.value = note
@@ -83,7 +83,7 @@ class NotesViewModel(
                 val updated = current.copy(
                     title = title,
                     content = content,
-                    lastUpdated = System.currentTimeMillis()
+                    lastEditedAt = System.currentTimeMillis()
                 )
                 repository.updateNote(updated)
                 _activeNote.value = updated

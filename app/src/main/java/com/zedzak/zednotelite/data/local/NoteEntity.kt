@@ -9,7 +9,8 @@ data class NoteEntity(
     val id: String,
     val title: String,
     val content: String,
-    val lastUpdated: Long
+    val lastEditedAt: Long,
+    val isDeleted: Boolean = false
 )
 
 
@@ -17,13 +18,15 @@ fun NoteEntity.toNote() = Note(
     id = id.toString(),
     title = title,
     content = content,
-    lastUpdated = lastUpdated
+    lastEditedAt = lastEditedAt,
+    isDeleted = isDeleted
 )
 
 fun Note.toEntity() = NoteEntity(
     id = id,
     title = title,
     content = content,
-    lastUpdated = lastUpdated
+    lastEditedAt = lastEditedAt,
+    isDeleted = isDeleted
 )
 
