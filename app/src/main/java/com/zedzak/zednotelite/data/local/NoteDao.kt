@@ -9,7 +9,7 @@ import androidx.room.OnConflictStrategy
 @Dao
 interface NoteDao {
 
-    @Query("SELECT * FROM notes ORDER BY lastUpdated DESC")
+    @Query("SELECT * FROM notes ORDER BY lastEditedAt DESC")
     suspend fun getAllNotes(): List<NoteEntity>
 
     @Query("SELECT * FROM notes WHERE id = :id LIMIT 1")
