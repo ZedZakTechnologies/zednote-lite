@@ -14,7 +14,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.collectAsState
 import com.zedzak.zednotelite.ui.viewmodel.NotesViewModel
-
+import com.zedzak.zednotelite.model.Note
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -23,10 +23,11 @@ fun EditorScreen(
     viewModel: NotesViewModel,
     onBack: () -> Unit
 ) {
-    val note by viewModel.activeNote.collectAsState()
+    val activeNote by viewModel.activeNote.collectAsState()
 
-    var title by remember(note?.id) { mutableStateOf(note?.title ?: "") }
-    var content by remember(note?.id) { mutableStateOf(note?.content ?: "") }
+    val title = activeNote?.title.orEmpty()
+    val content = activeNote?.content.orEmpty()
+
 
     Scaffold(
         topBar = {
@@ -55,19 +56,31 @@ fun EditorScreen(
         ) {
             OutlinedTextField(
                 value = title,
-                onValueChange = { title = it },
-                placeholder = { Text("Title") },
-                modifier = Modifier.fillMaxWidth()
+                onValueChange = { newTitle ->
+                    activeNote?.let { note ->
+                        viewModel.onEditorChanged(
+                            note.copy(title = newTitle)
+                        )
+                    }
+                },
+                placeholder = { Text("Title") }
             )
+
 
             OutlinedTextField(
                 value = content,
-                onValueChange = { content = it },
-                placeholder = { Text("Write your note…") },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(1f)
+                onValueChange = { newContent ->
+                    activeNote?.let { note ->
+                        viewModel.onEditorChanged(
+                            note.copy(content = newContent)
+                        )
+                    }
+                },
+                placeholder = { Text("Write your note…") }
             )
+
+
+
         }
     }
 }

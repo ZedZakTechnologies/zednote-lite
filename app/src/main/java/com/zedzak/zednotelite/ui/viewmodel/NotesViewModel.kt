@@ -9,6 +9,12 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import java.util.UUID
 import com.zedzak.zednotelite.data.local.toEntity
+import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.asStateFlow
+
 
 class NotesViewModel(
     private val repository: NotesDataSource
@@ -18,11 +24,23 @@ class NotesViewModel(
     val notes: StateFlow<List<Note>> = _notes
 
     private val _activeNote = MutableStateFlow<Note?>(null)
-    val activeNote: StateFlow<Note?> = _activeNote
+    val activeNote = _activeNote.asStateFlow()
+    private val autosaveTrigger =
+        MutableSharedFlow<Note>(
+            extraBufferCapacity = 1
+        )
 
     init {
-        loadNotes()
+        viewModelScope.launch {
+            autosaveTrigger
+                .debounce(400)
+                .collect { draft ->
+                    repository.updateNote(draft)
+                }
+        }
     }
+
+
 
     private fun loadNotes() {
         viewModelScope.launch {
@@ -100,6 +118,47 @@ class NotesViewModel(
             loadNotes()
         }
     }
+
+    private val editorState = MutableStateFlow(
+        EditorDraft(title = "", content = "")
+    )
+
+    data class EditorDraft(
+        val title: String,
+        val content: String
+    )
+
+    fun onTitleChanged(title: String) {
+        editorState.update { it.copy(title = title) }
+    }
+
+    fun onContentChanged(content: String) {
+        editorState.update { it.copy(content = content) }
+    }
+
+    private suspend fun autosave(draft: EditorDraft) {
+        val note = _activeNote.value ?: return
+
+        if (
+            note.title == draft.title &&
+            note.content == draft.content
+        ) return
+
+        val updated = note.copy(
+            title = draft.title,
+            content = draft.content,
+            lastEditedAt = System.currentTimeMillis()
+        )
+
+        repository.updateNote(updated)
+        _activeNote.value = updated
+    }
+
+    fun onEditorChanged(note: Note) {
+        _activeNote.value = note
+        autosaveTrigger.tryEmit(note)
+    }
+
 
 
 
