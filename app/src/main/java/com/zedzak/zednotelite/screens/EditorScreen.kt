@@ -24,6 +24,8 @@ import androidx.compose.runtime.setValue
 
 
 import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.text.style.TextAlign
 
 
@@ -34,106 +36,95 @@ import androidx.compose.ui.text.style.TextAlign
 fun EditorScreen(
     modifier: Modifier = Modifier,
     viewModel: NotesViewModel,
+    noteId: String,
     onBack: () -> Unit
 ) {
     val activeNote by viewModel.activeNote.collectAsState()
 
-    val title = activeNote?.title.orEmpty()
-    val content = activeNote?.content.orEmpty()
+    // 1) Load the requested note whenever noteId changes
+    LaunchedEffect(noteId) {
+        viewModel.openNote(noteId)
+    }
 
+    // 2) Local editor fields (don’t initialize from activeNote here)
+    var title by rememberSaveable(noteId) { mutableStateOf("") }
+    var content by rememberSaveable(noteId) { mutableStateOf("") }
 
-
-
-    val wordCount by remember(content) {
-        derivedStateOf {
-            content
-                .trim()
-                .split(Regex("\\s+"))
-                .filter { it.isNotBlank() }
-                .size
+    // 3) When the RIGHT note arrives, hydrate the UI fields
+    LaunchedEffect(activeNote?.id, noteId) {
+        val n = activeNote
+        if (n != null && n.id == noteId) {
+            title = n.title
+            content = n.content
         }
     }
 
-    val charCount by remember(content) {
-        derivedStateOf { content.length }
+    // Word count (simple + reliable)
+    val wordCount by remember(content) {
+        derivedStateOf {
+            content.trim().split(Regex("\\s+")).filter { it.isNotBlank() }.size
+        }
     }
-
-
 
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(text = "Edit Note") },
+                title = { Text("Edit Note") },
                 navigationIcon = {
                     IconButton(onClick = {
-                        viewModel.saveNote(title, content)
+                        viewModel.saveAndClose(title, content)
                         onBack()
                     }) {
-                        Icon(
-                            imageVector = Icons.Filled.ArrowBack,
-                            contentDescription = "Back"
-                        )
+                        Icon(Icons.Default.ArrowBack, contentDescription = "Back")
                     }
                 }
             )
         }
-    ) { innerPadding ->
+    ) { padding ->
         Column(
             modifier = modifier
                 .fillMaxSize()
-                .padding(innerPadding)
+                .padding(padding)
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             OutlinedTextField(
                 value = title,
                 onValueChange = { newTitle ->
-                    activeNote?.let { note ->
-                        viewModel.onEditorChanged(
-                            note.copy(title = newTitle)
-                        )
+                    title = newTitle
+
+                    // Only autosave if we are editing the correct loaded note
+                    val n = activeNote
+                    if (n != null && n.id == noteId) {
+                        viewModel.onEditorChanged(n.copy(title = newTitle, content = content))
                     }
                 },
-                placeholder = { Text("Title") }
+                label = { Text("Title") },
+                modifier = Modifier.fillMaxWidth()
             )
-
 
             OutlinedTextField(
                 value = content,
                 onValueChange = { newContent ->
-                    activeNote?.let { note ->
-                        viewModel.onEditorChanged(
-                            note.copy(content = newContent)
-                        )
+                    content = newContent
+
+                    val n = activeNote
+                    if (n != null && n.id == noteId) {
+                        viewModel.onEditorChanged(n.copy(title = title, content = newContent))
                     }
                 },
-                placeholder = { Text("Write your note…") },
+                label = { Text("Note") },
                 modifier = Modifier
                     .fillMaxWidth()
                     .weight(1f)
-
             )
+
             Text(
-                text = "$wordCount words · $charCount chars",
-                style = MaterialTheme.typography.labelSmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 4.dp),
-                textAlign = TextAlign.End
+                text = "Words: $wordCount",
+                style = MaterialTheme.typography.bodySmall,
+                modifier = Modifier.fillMaxWidth()
             )
-
-
-
-
-
-
         }
     }
-
-
-
 }
-
-
 

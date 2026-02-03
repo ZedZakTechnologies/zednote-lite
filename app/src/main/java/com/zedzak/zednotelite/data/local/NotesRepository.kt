@@ -1,11 +1,21 @@
 package com.zedzak.zednotelite.data.local
 
 import com.zedzak.zednotelite.data.local.NoteEntity
+import kotlinx.coroutines.flow.Flow
+import com.zedzak.zednotelite.model.Note
 
 interface NotesRepository {
 
-    suspend fun getNotes(): List<NoteEntity>
+    fun getAllNotes(): Flow<List<Note>>
 
+    suspend fun getNoteById(id: String): Note?
 
-    suspend fun deleteNote(note: NoteEntity)
+    suspend fun addNote(note: Note)
+
+    suspend fun updateNote(note: Note)
+
+    suspend fun deleteNote(note: Note)
 }
+
+
+

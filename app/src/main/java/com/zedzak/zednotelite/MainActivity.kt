@@ -60,8 +60,9 @@ fun AppRoot() {
 
                 @Suppress("UNCHECKED_CAST")
                 return NotesViewModel(
-                    repository = RoomNotesDataSource(dao)
+                    repository = RoomNotesRepository(dao)
                 ) as T
+
             }
         }
     )
@@ -82,9 +83,8 @@ fun AppRoot() {
                 HomeScreen(
                     viewModel = notesViewModel,
                     onOpenEditor = {
-                        notesViewModel.startNewNote { id ->
-                            navController.navigate(Routes.editor(id))
-                        }
+                        val id = notesViewModel.createNewNote()
+                        navController.navigate(Routes.editor(id))
                     },
                     onOpenNote = { noteId ->
                         navController.navigate(Routes.editor(noteId))
@@ -97,12 +97,17 @@ fun AppRoot() {
                 arguments = listOf(
                     navArgument("noteId") { type = NavType.StringType }
                 )
-            ) {
+            ) { backStackEntry ->
+                val noteId = backStackEntry.arguments?.getString("noteId") ?: return@composable
+
                 EditorScreen(
                     viewModel = notesViewModel,
+                    noteId = noteId,
                     onBack = { navController.popBackStack() }
                 )
             }
+
+
 
 
         }

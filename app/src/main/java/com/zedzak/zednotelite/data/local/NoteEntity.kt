@@ -22,11 +22,3 @@ fun NoteEntity.toNote() = Note(
     isDeleted = isDeleted
 )
 
-fun Note.toEntity() = NoteEntity(
-    id = id,
-    title = title,
-    content = content,
-    lastEditedAt = lastEditedAt,
-    isDeleted = isDeleted
-)
-

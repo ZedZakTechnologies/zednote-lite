@@ -5,12 +5,13 @@ import androidx.room.Insert
 import androidx.room.Update
 import androidx.room.Delete
 import androidx.room.OnConflictStrategy
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface NoteDao {
 
-    @Query("SELECT * FROM notes ORDER BY lastEditedAt DESC")
-    suspend fun getAllNotes(): List<NoteEntity>
+    @Query("SELECT * FROM notes WHERE isDeleted = 0 ORDER BY lastEditedAt DESC")
+    fun getAllNotes(): Flow<List<NoteEntity>>
 
     @Query("SELECT * FROM notes WHERE id = :id LIMIT 1")
     suspend fun getNoteById(id: String): NoteEntity?
