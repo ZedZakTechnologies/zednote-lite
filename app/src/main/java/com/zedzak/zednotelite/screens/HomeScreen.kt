@@ -28,12 +28,16 @@ fun HomeScreen(
     viewModel: NotesViewModel,
     onOpenEditor: () -> Unit,
     onOpenNote: (String) -> Unit,
+    onOpenSettings: () -> Unit,
     modifier: Modifier = Modifier
 )  {
     val notes by viewModel.notes.collectAsState()
     val visibleNotes = notes.filter {
         it.title.isNotBlank() || it.content.isNotBlank()
     }
+
+// Point 3 to be added here?
+
     Column(
         modifier = modifier
             .fillMaxSize()

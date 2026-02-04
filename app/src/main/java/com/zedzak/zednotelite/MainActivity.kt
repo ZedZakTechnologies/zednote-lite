@@ -31,8 +31,19 @@ import com.zedzak.zednotelite.data.NotesDataSource
 import com.zedzak.zednotelite.data.local.DatabaseProvider
 import com.zedzak.zednotelite.data.local.RoomNotesDataSource
 import com.zedzak.zednotelite.data.local.RoomNotesRepository
+import androidx.compose.runtime.remember
+import com.zedzak.zednotelite.data.settings.SettingsRepository
+import com.zedzak.zednotelite.data.settings.settingsDataStore
+import com.zedzak.zednotelite.ui.settings.SettingsViewModel
+import com.zedzak.zednotelite.ui.settings.SettingsScreen
 
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.ExperimentalMaterial3Api
 
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Settings
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -46,6 +57,7 @@ class MainActivity : ComponentActivity() {
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AppRoot() {
     val navController = rememberNavController()
@@ -67,6 +79,13 @@ fun AppRoot() {
         }
     )
 
+    val settingsRepository = remember {
+        SettingsRepository(context.applicationContext.settingsDataStore)
+    }
+
+    val settingsViewModel = remember {
+        SettingsViewModel(settingsRepository)
+    }
 
 
     Scaffold(
@@ -80,17 +99,37 @@ fun AppRoot() {
         ) {
 
             composable(Routes.HOME) {
-                HomeScreen(
-                    viewModel = notesViewModel,
-                    onOpenEditor = {
-                        val id = notesViewModel.createNewNote()
-                        navController.navigate(Routes.editor(id))
-                    },
-                    onOpenNote = { noteId ->
-                        navController.navigate(Routes.editor(noteId))
+                Scaffold(
+                    topBar = {
+                        TopAppBar(
+                            title = { Text("ZedNote Lite") },
+                            actions = {
+                                IconButton(
+                                    onClick = { navController.navigate("settings") }
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Default.Settings,
+                                        contentDescription = "Settings"
+                                    )
+                                }
+                            }
+                        )
                     }
-                )
+                ) { padding ->
+                    HomeScreen(
+                        viewModel = notesViewModel,
+                        onOpenEditor = { /* existing logic */ },
+                        onOpenNote = { noteId ->
+                            navController.navigate(Routes.editor(noteId))
+                        },
+                        onOpenSettings = {
+                            navController.navigate("settings")
+                        },
+                        modifier = Modifier.padding(padding)
+                    )
+                }
             }
+
 
             composable(
                 route = Routes.EDITOR,
@@ -107,6 +146,12 @@ fun AppRoot() {
                 )
             }
 
+            composable("settings") {
+                SettingsScreen(
+                    viewModel = settingsViewModel,
+                    onBack = { navController.popBackStack() }
+                )
+            }
 
 
 
