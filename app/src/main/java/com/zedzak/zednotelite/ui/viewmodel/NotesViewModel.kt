@@ -33,7 +33,7 @@ class NotesViewModel(
         MutableSharedFlow<Note>(extraBufferCapacity = 1)
 
     init {
-        // 1️⃣ Notes list pipeline (Room → UI)
+        //  Notes list pipeline (Room → UI)
         viewModelScope.launch {
             repository.getAllNotes()
                 .collect { notes: List<Note> ->
@@ -41,7 +41,7 @@ class NotesViewModel(
                 }
         }
 
-        // 2️⃣ Autosave pipeline (updates only)
+        //  Autosave pipeline (updates only)
         viewModelScope.launch {
             autosaveTrigger
                 .debounce(400)
