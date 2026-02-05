@@ -118,7 +118,10 @@ fun AppRoot() {
                 ) { padding ->
                     HomeScreen(
                         viewModel = notesViewModel,
-                        onOpenEditor = { /* existing logic */ },
+                        onOpenEditor = {
+                            val noteId = notesViewModel.createNewNote()
+                            navController.navigate(Routes.editor(noteId))
+                        },
                         onOpenNote = { noteId ->
                             navController.navigate(Routes.editor(noteId))
                         },

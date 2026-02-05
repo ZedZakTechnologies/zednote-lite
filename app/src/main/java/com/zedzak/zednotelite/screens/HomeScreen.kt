@@ -76,37 +76,7 @@ fun HomeScreen(
     }
 
 
-    Column(
-        modifier = modifier
-            .fillMaxSize()
-            .padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp)
-    ) {
-        Text(
-            text = "ZedNote Lite",
-            style = MaterialTheme.typography.titleLarge
-        )
 
-        Button(onClick = onOpenEditor) {
-            Text("New Note")
-        }
-
-
-
-
-
-        LazyColumn(
-            verticalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            items(notes) { note ->
-                NoteRow(
-                    note = note,
-                    onClick = { onOpenNote(note.id) }
-                )
-            }
-        }
-
-    }
 }
 
 
