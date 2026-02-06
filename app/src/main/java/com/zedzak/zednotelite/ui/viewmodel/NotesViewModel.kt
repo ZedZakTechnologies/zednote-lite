@@ -17,7 +17,8 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import com.zedzak.zednotelite.data.local.NotesRepository
 import com.zedzak.zednotelite.model.isEffectivelyEmpty
-
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.stateIn
 
 class NotesViewModel(
     private val repository: NotesRepository
@@ -31,6 +32,26 @@ class NotesViewModel(
 
     private val autosaveTrigger =
         MutableSharedFlow<Note>(extraBufferCapacity = 1)
+
+    private val _searchQuery = MutableStateFlow("")
+    val searchQuery: StateFlow<String> = _searchQuery.asStateFlow()
+
+    val visibleNotes: StateFlow<List<Note>> =
+        combine(_notes, _searchQuery) { notes, query ->
+            if (query.isBlank()) {
+                notes
+            } else {
+                val q = query.trim()
+                notes.filter { note ->
+                    note.title.contains(q, ignoreCase = true) ||
+                            note.content.contains(q, ignoreCase = true)
+                }
+            }
+        }.stateIn(
+            scope = viewModelScope,
+            started = kotlinx.coroutines.flow.SharingStarted.WhileSubscribed(5_000),
+            initialValue = emptyList()
+        )
 
     init {
         //  Notes list pipeline (Room → UI)
@@ -122,4 +143,9 @@ class NotesViewModel(
             repository.deleteNote(note)
         }
     }
+
+    fun updateSearchQuery(query: String) {
+        _searchQuery.value = query
+    }
+
 }

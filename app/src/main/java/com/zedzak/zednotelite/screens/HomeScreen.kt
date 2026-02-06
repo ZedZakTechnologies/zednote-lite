@@ -31,12 +31,15 @@ fun HomeScreen(
     onOpenSettings: () -> Unit,
     modifier: Modifier = Modifier
 )  {
-    val notes by viewModel.notes.collectAsState()
-    val visibleNotes = notes.filter {
-        it.title.isNotBlank() || it.content.isNotBlank()
-    }
+    val notes by viewModel.visibleNotes.collectAsState()
+    //val visibleNotes = notes.filter {
+    //    it.title.isNotBlank() || it.content.isNotBlank()
+    //}
 
-// Point 3 to be added here?
+    val searchQuery by viewModel.searchQuery.collectAsState()
+
+
+
 
     Column(
         modifier = modifier
@@ -47,6 +50,16 @@ fun HomeScreen(
         Text(
             text = "ZedNote Lite",
             style = MaterialTheme.typography.titleLarge
+        )
+
+        TextField(
+            value = searchQuery,
+            onValueChange = { text ->
+                viewModel.updateSearchQuery(text)
+            },
+            modifier = Modifier.fillMaxWidth(),
+            placeholder = { Text("Search notes") },
+            singleLine = true
         )
 
         Button(
