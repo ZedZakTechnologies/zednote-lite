@@ -19,6 +19,18 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import com.zedzak.zednotelite.ui.viewmodel.NotesViewModel
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Sort
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.Text
+import com.zedzak.zednotelite.model.NoteSortMode
+import com.zedzak.zednotelite.ui.settings.SettingsViewModel
 
 
 
@@ -26,19 +38,15 @@ import com.zedzak.zednotelite.ui.viewmodel.NotesViewModel
 @Composable
 fun HomeScreen(
     viewModel: NotesViewModel,
+    settingsViewModel: SettingsViewModel,
     onOpenEditor: () -> Unit,
     onOpenNote: (String) -> Unit,
     onOpenSettings: () -> Unit,
     modifier: Modifier = Modifier
 )  {
     val notes by viewModel.visibleNotes.collectAsState()
-    //val visibleNotes = notes.filter {
-    //    it.title.isNotBlank() || it.content.isNotBlank()
-    //}
 
     val searchQuery by viewModel.searchQuery.collectAsState()
-
-
 
 
     Column(
@@ -47,10 +55,10 @@ fun HomeScreen(
             .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        Text(
-            text = "ZedNote Lite",
-            style = MaterialTheme.typography.titleLarge
-        )
+        //Text(
+        //    text = "ZedNote Lite",
+        //    style = MaterialTheme.typography.titleLarge
+       // )
 
         TextField(
             value = searchQuery,
@@ -62,6 +70,44 @@ fun HomeScreen(
             singleLine = true
         )
 
+        var sortMenuExpanded by remember { mutableStateOf(false) }
+
+
+        Box {
+            IconButton(onClick = { sortMenuExpanded = true }) {
+                Icon(
+                    imageVector = Icons.Default.Sort,
+                    contentDescription = "Sort notes"
+                )
+            }
+
+            DropdownMenu(
+                expanded = sortMenuExpanded,
+                onDismissRequest = { sortMenuExpanded = false }
+            ) {
+                DropdownMenuItem(
+                    text = { Text("Last edited") },
+                    onClick = {
+                        settingsViewModel.updateSortMode(NoteSortMode.LAST_EDITED)
+                        sortMenuExpanded = false
+                    }
+                )
+                DropdownMenuItem(
+                    text = { Text("Created date") },
+                    onClick = {
+                        settingsViewModel.updateSortMode(NoteSortMode.CREATED_DATE)
+                        sortMenuExpanded = false
+                    }
+                )
+                DropdownMenuItem(
+                    text = { Text("Title") },
+                    onClick = {
+                        settingsViewModel.updateSortMode(NoteSortMode.TITLE)
+                        sortMenuExpanded = false
+                    }
+                )
+            }
+        }
         Button(
             onClick = onOpenEditor,
             modifier = Modifier.fillMaxWidth()

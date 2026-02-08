@@ -19,13 +19,34 @@ import com.zedzak.zednotelite.data.local.NotesRepository
 import com.zedzak.zednotelite.model.isEffectivelyEmpty
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
+import com.zedzak.zednotelite.model.NoteSortMode
+import kotlinx.coroutines.flow.SharingStarted
 
 class NotesViewModel(
-    private val repository: NotesRepository
+    private val repository: NotesRepository,
+    private val sortModeFlow: StateFlow<NoteSortMode>
 ) : ViewModel() {
 
     private val _notes = MutableStateFlow<List<Note>>(emptyList())
     val notes: StateFlow<List<Note>> = _notes.asStateFlow()
+
+    private val sortedNotes: StateFlow<List<Note>> =
+        combine(_notes, sortModeFlow) { notes, sortMode ->
+            when (sortMode) {
+                NoteSortMode.LAST_EDITED ->
+                    notes.sortedByDescending { it.lastEditedAt }
+
+                NoteSortMode.CREATED_DATE ->
+                    notes.sortedByDescending { it.createdAt }
+
+                NoteSortMode.TITLE ->
+                    notes.sortedBy { it.title.lowercase() }
+            }
+        }.stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5_000),
+            initialValue = emptyList()
+        )
 
     private val _activeNote = MutableStateFlow<Note?>(null)
     val activeNote: StateFlow<Note?> = _activeNote.asStateFlow()
@@ -37,21 +58,37 @@ class NotesViewModel(
     val searchQuery: StateFlow<String> = _searchQuery.asStateFlow()
 
     val visibleNotes: StateFlow<List<Note>> =
-        combine(_notes, _searchQuery) { notes, query ->
+        combine(
+            _notes,
+            sortModeFlow,
+            searchQuery
+        ) { notes, sortMode, query ->
+
+            val sortedNotes = when (sortMode) {
+                NoteSortMode.LAST_EDITED ->
+                    notes.sortedByDescending { it.lastEditedAt }
+
+                NoteSortMode.CREATED_DATE ->
+                    notes.sortedByDescending { it.createdAt }
+
+                NoteSortMode.TITLE ->
+                    notes.sortedBy { it.title.lowercase() }
+            }
+
             if (query.isBlank()) {
-                notes
+                sortedNotes
             } else {
-                val q = query.trim()
-                notes.filter { note ->
-                    note.title.contains(q, ignoreCase = true) ||
-                            note.content.contains(q, ignoreCase = true)
+                sortedNotes.filter {
+                    it.title.contains(query, ignoreCase = true) ||
+                            it.content.contains(query, ignoreCase = true)
                 }
             }
         }.stateIn(
             scope = viewModelScope,
-            started = kotlinx.coroutines.flow.SharingStarted.WhileSubscribed(5_000),
+            started = SharingStarted.WhileSubscribed(5_000),
             initialValue = emptyList()
         )
+
 
     init {
         //  Notes list pipeline (Room → UI)
@@ -82,6 +119,7 @@ class NotesViewModel(
             title = "",
             content = "",
             lastEditedAt = System.currentTimeMillis(),
+
             isDeleted = false
         )
 

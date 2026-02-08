@@ -5,6 +5,7 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import com.zedzak.zednotelite.model.NoteSortMode
 
 class SettingsRepository(
     private val dataStore: DataStore<Preferences>
@@ -31,4 +32,11 @@ class SettingsRepository(
             prefs[SettingsKeys.AUTOSAVE_ENABLED] = enabled
         }
     }
+
+    suspend fun updateSortMode(mode: NoteSortMode) {
+        dataStore.edit { prefs ->
+            prefs[SettingsKeys.SORT_MODE] = mode.name
+        }
+    }
+
 }

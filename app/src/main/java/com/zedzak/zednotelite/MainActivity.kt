@@ -44,6 +44,15 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Settings
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.SharingStarted
+import com.zedzak.zednotelite.model.NoteSortMode
+
+
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -62,6 +71,18 @@ class MainActivity : ComponentActivity() {
 fun AppRoot() {
     val navController = rememberNavController()
     val context = LocalContext.current
+    val settingsRepository = remember {
+        SettingsRepository(context.applicationContext.settingsDataStore)
+    }
+
+    val settingsViewModel: SettingsViewModel = viewModel(
+        factory = object : ViewModelProvider.Factory {
+            override fun <T : ViewModel> create(modelClass: Class<T>): T {
+                @Suppress("UNCHECKED_CAST")
+                return SettingsViewModel(settingsRepository) as T
+            }
+        }
+    )
 
     val notesViewModel: NotesViewModel = viewModel(
         factory = object : ViewModelProvider.Factory {
@@ -72,20 +93,21 @@ fun AppRoot() {
 
                 @Suppress("UNCHECKED_CAST")
                 return NotesViewModel(
-                    repository = RoomNotesRepository(dao)
+                    repository = RoomNotesRepository(dao),
+                    sortModeFlow = settingsViewModel.sortMode
                 ) as T
-
             }
         }
     )
 
-    val settingsRepository = remember {
-        SettingsRepository(context.applicationContext.settingsDataStore)
-    }
 
-    val settingsViewModel = remember {
-        SettingsViewModel(settingsRepository)
-    }
+    //val settingsRepository = remember {
+     //   SettingsRepository(context.applicationContext.settingsDataStore)
+    //}
+
+    //val settingsViewModel = remember {
+     //   SettingsViewModel(settingsRepository)
+   // }
 
 
     Scaffold(
@@ -118,6 +140,7 @@ fun AppRoot() {
                 ) { padding ->
                     HomeScreen(
                         viewModel = notesViewModel,
+                        settingsViewModel = settingsViewModel,
                         onOpenEditor = {
                             val noteId = notesViewModel.createNewNote()
                             navController.navigate(Routes.editor(noteId))

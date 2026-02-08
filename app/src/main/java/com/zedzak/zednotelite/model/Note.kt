@@ -5,6 +5,7 @@ data class Note(
     val title: String,
     val content: String,
     val lastEditedAt: Long,
+    val createdAt: Long = lastEditedAt,
     val isDeleted: Boolean = false
 ) {
     val isPersisted: Boolean
