@@ -94,7 +94,8 @@ fun AppRoot() {
                 @Suppress("UNCHECKED_CAST")
                 return NotesViewModel(
                     repository = RoomNotesRepository(dao),
-                    sortModeFlow = settingsViewModel.sortMode
+                    sortModeFlow = settingsViewModel.sortMode,
+                    sortDirectionFlow = settingsViewModel.sortDirection
                 ) as T
             }
         }

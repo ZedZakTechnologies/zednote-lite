@@ -12,4 +12,5 @@ object SettingsKeys {
         booleanPreferencesKey("autosave_enabled")
 
     val SORT_MODE = stringPreferencesKey("sort_mode")
+    val SORT_DIRECTION = stringPreferencesKey("sort_direction")
 }

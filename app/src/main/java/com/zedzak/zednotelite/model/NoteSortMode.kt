@@ -6,7 +6,11 @@ enum class NoteSortMode {
     TITLE
 }
 
-enum class SortDirection {
-    ASC,
-    DESC
-}
+//enum class SortDirection {
+//    ASC,
+//    DESC
+//}
+data class NoteSortConfig(
+    val mode: NoteSortMode,
+    val direction: SortDirection
+)

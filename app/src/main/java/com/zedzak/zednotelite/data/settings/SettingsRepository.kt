@@ -6,6 +6,7 @@ import androidx.datastore.preferences.core.edit
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import com.zedzak.zednotelite.model.NoteSortMode
+import com.zedzak.zednotelite.model.SortDirection
 
 class SettingsRepository(
     private val dataStore: DataStore<Preferences>
@@ -17,8 +18,20 @@ class SettingsRepository(
                 showWordCount =
                     prefs[SettingsKeys.SHOW_WORD_COUNT] ?: true,
                 autosaveEnabled =
-                    prefs[SettingsKeys.AUTOSAVE_ENABLED] ?: true
+                    prefs[SettingsKeys.AUTOSAVE_ENABLED] ?: true,
+
+                sortMode =
+                    prefs[SettingsKeys.SORT_MODE]
+                        ?.let { NoteSortMode.valueOf(it) }
+                    ?: NoteSortMode.LAST_EDITED,
+
+                sortDirection =
+                    prefs[SettingsKeys.SORT_DIRECTION]
+                        ?.let { SortDirection.valueOf(it) }
+                        ?: SortDirection.DESC
+
             )
+
         }
 
     suspend fun setShowWordCount(enabled: Boolean) {
@@ -38,5 +51,12 @@ class SettingsRepository(
             prefs[SettingsKeys.SORT_MODE] = mode.name
         }
     }
+
+    suspend fun updateSortDirection(direction: SortDirection) {
+        dataStore.edit { prefs ->
+            prefs[SettingsKeys.SORT_DIRECTION] = direction.name
+        }
+    }
+
 
 }

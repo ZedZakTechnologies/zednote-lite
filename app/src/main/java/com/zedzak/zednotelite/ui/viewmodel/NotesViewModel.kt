@@ -21,32 +21,41 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import com.zedzak.zednotelite.model.NoteSortMode
 import kotlinx.coroutines.flow.SharingStarted
+import com.zedzak.zednotelite.model.SortDirection
 
 class NotesViewModel(
     private val repository: NotesRepository,
-    private val sortModeFlow: StateFlow<NoteSortMode>
+    private val sortModeFlow: StateFlow<NoteSortMode>,
+    private val sortDirectionFlow: StateFlow<SortDirection>
 ) : ViewModel() {
 
     private val _notes = MutableStateFlow<List<Note>>(emptyList())
     val notes: StateFlow<List<Note>> = _notes.asStateFlow()
 
-    private val sortedNotes: StateFlow<List<Note>> =
-        combine(_notes, sortModeFlow) { notes, sortMode ->
-            when (sortMode) {
-                NoteSortMode.LAST_EDITED ->
-                    notes.sortedByDescending { it.lastEditedAt }
+    private fun applySort(
+        notes: List<Note>,
+        mode: NoteSortMode,
+        direction: SortDirection
+    ): List<Note> {
 
-                NoteSortMode.CREATED_DATE ->
-                    notes.sortedByDescending { it.createdAt }
+        val sorted = when (mode) {
+            NoteSortMode.LAST_EDITED ->
+                notes.sortedBy { it.lastEditedAt }
 
-                NoteSortMode.TITLE ->
-                    notes.sortedBy { it.title.lowercase() }
-            }
-        }.stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5_000),
-            initialValue = emptyList()
-        )
+            NoteSortMode.CREATED_DATE ->
+                notes.sortedBy { it.createdAt }
+
+            NoteSortMode.TITLE ->
+                notes.sortedBy { it.title.lowercase() }
+        }
+
+        return if (direction == SortDirection.DESC) {
+            sorted.reversed()
+        } else {
+            sorted
+        }
+    }
+
 
     private val _activeNote = MutableStateFlow<Note?>(null)
     val activeNote: StateFlow<Note?> = _activeNote.asStateFlow()
@@ -61,24 +70,16 @@ class NotesViewModel(
         combine(
             _notes,
             sortModeFlow,
+            sortDirectionFlow,
             searchQuery
-        ) { notes, sortMode, query ->
+        ) { notes, sortMode, sortDirection, query ->
 
-            val sortedNotes = when (sortMode) {
-                NoteSortMode.LAST_EDITED ->
-                    notes.sortedByDescending { it.lastEditedAt }
-
-                NoteSortMode.CREATED_DATE ->
-                    notes.sortedByDescending { it.createdAt }
-
-                NoteSortMode.TITLE ->
-                    notes.sortedBy { it.title.lowercase() }
-            }
+            val sorted = applySort(notes, sortMode, sortDirection)
 
             if (query.isBlank()) {
-                sortedNotes
+                sorted
             } else {
-                sortedNotes.filter {
+                sorted.filter {
                     it.title.contains(query, ignoreCase = true) ||
                             it.content.contains(query, ignoreCase = true)
                 }
@@ -88,6 +89,7 @@ class NotesViewModel(
             started = SharingStarted.WhileSubscribed(5_000),
             initialValue = emptyList()
         )
+
 
 
     init {
