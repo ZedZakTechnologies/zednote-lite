@@ -8,16 +8,24 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.launch
 import com.zedzak.zednotelite.model.NoteSortMode
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.distinctUntilChanged
 import com.zedzak.zednotelite.model.SortDirection
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.combine
+
 
 class SettingsViewModel(
     private val repository: SettingsRepository
 ) : ViewModel() {
+
+
+
 
     val settings: StateFlow<SettingsState> =
         repository.settingsFlow
@@ -26,6 +34,22 @@ class SettingsViewModel(
                 started = SharingStarted.WhileSubscribed(5_000),
                 initialValue = SettingsState()
             )
+
+    private val sortDirectionsByMode =
+        MutableStateFlow<Map<NoteSortMode, SortDirection>>(emptyMap())
+
+    init {
+        viewModelScope.launch {
+            repository.sortDirectionsFlow()
+                .collect { persisted ->
+                    sortDirectionsByMode.update { current ->
+                        // hydrate once only
+                        if (current.isEmpty()) persisted else current
+                    }
+                }
+        }
+    }
+
 
     val sortMode: StateFlow<NoteSortMode> =
         settings
@@ -38,14 +62,20 @@ class SettingsViewModel(
             )
 
     val sortDirection: StateFlow<SortDirection> =
-        settings
-            .map { it.sortDirection }
+        combine(
+            sortMode,
+            sortDirectionsByMode
+        ) { mode, map ->
+            map[mode] ?: SortDirection.ASC
+        }
             .distinctUntilChanged()
             .stateIn(
                 scope = viewModelScope,
                 started = SharingStarted.WhileSubscribed(5_000),
-                initialValue = SortDirection.DESC
+                initialValue = SortDirection.ASC
             )
+
+
 
     val showWordCount: StateFlow<Boolean> =
         settings
@@ -81,31 +111,35 @@ class SettingsViewModel(
 
     fun onSortModeSelected(mode: NoteSortMode) {
         viewModelScope.launch {
-            val current = settings.value
+            val currentMode = sortMode.value
+            val currentMap = sortDirectionsByMode.value.toMutableMap()
 
-            if (current.sortMode == mode) {
-                // Same mode tapped again → toggle direction
-                val newDirection =
-                    if (current.sortDirection == SortDirection.ASC)
+            if (currentMode == mode) {
+                val currentDir =
+                    currentMap[mode] ?: SortDirection.ASC
+
+                val newDir =
+                    if (currentDir == SortDirection.ASC)
                         SortDirection.DESC
                     else
                         SortDirection.ASC
 
-                repository.updateSortDirection(newDirection)
+                currentMap[mode] = newDir
+                repository.persistSortDirection(mode, newDir)
             } else {
-                // New mode selected → reset direction to ASC
+                currentMap.putIfAbsent(mode, SortDirection.ASC)
                 repository.updateSortMode(mode)
-                repository.updateSortDirection(SortDirection.ASC)
+
+                repository.persistSortDirection(
+                    mode,
+                    currentMap[mode]!!
+                )
             }
+
+            sortDirectionsByMode.value = currentMap
         }
     }
 
-
-    fun updateSortDirection(direction: SortDirection) {
-        viewModelScope.launch {
-            repository.updateSortDirection(direction)
-        }
-    }
 
     fun setAutosaveEnabled(enabled: Boolean) {
         viewModelScope.launch {

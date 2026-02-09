@@ -58,5 +58,32 @@ class SettingsRepository(
         }
     }
 
+    private fun keyForMode(mode: NoteSortMode) =
+        when (mode) {
+            NoteSortMode.LAST_EDITED ->
+                SettingsKeys.SORT_DIRECTION_LAST_EDITED
+            NoteSortMode.CREATED_DATE ->
+                SettingsKeys.SORT_DIRECTION_CREATED_DATE
+            NoteSortMode.TITLE ->
+                SettingsKeys.SORT_DIRECTION_TITLE
+        }
+
+    suspend fun persistSortDirection(
+        mode: NoteSortMode,
+        direction: SortDirection
+    ) {
+        dataStore.edit { prefs ->
+            prefs[keyForMode(mode)] = direction.name
+        }
+    }
+
+    fun sortDirectionsFlow(): Flow<Map<NoteSortMode, SortDirection>> =
+        dataStore.data.map { prefs ->
+            NoteSortMode.values().associateWith { mode ->
+                prefs[keyForMode(mode)]
+                    ?.let { SortDirection.valueOf(it) }
+                    ?: SortDirection.ASC
+            }
+        }
 
 }

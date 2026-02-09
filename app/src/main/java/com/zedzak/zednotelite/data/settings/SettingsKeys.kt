@@ -13,4 +13,14 @@ object SettingsKeys {
 
     val SORT_MODE = stringPreferencesKey("sort_mode")
     val SORT_DIRECTION = stringPreferencesKey("sort_direction")
+
+    val SORT_DIRECTION_LAST_EDITED =
+        stringPreferencesKey("sort_direction_last_edited")
+
+    val SORT_DIRECTION_CREATED_DATE =
+        stringPreferencesKey("sort_direction_created_date")
+
+    val SORT_DIRECTION_TITLE =
+        stringPreferencesKey("sort_direction_title")
+
 }

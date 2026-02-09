@@ -91,14 +91,14 @@ fun HomeScreen(
                 DropdownMenuItem(
                     text = { Text("Last edited") },
                     onClick = {
-                        settingsViewModel.onSortModeSelected(NoteSortMode.TITLE)
+                        settingsViewModel.onSortModeSelected(NoteSortMode.LAST_EDITED)
                         sortMenuExpanded = false
                     }
                 )
                 DropdownMenuItem(
                     text = { Text("Created date") },
                     onClick = {
-                        settingsViewModel.onSortModeSelected(NoteSortMode.TITLE)
+                        settingsViewModel.onSortModeSelected(NoteSortMode.CREATED_DATE)
                         sortMenuExpanded = false
                     }
                 )
