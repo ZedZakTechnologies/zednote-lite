@@ -27,7 +27,7 @@ import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.text.style.TextAlign
-
+import com.zedzak.zednotelite.ui.settings.SettingsViewModel
 
 
 
@@ -36,10 +36,14 @@ import androidx.compose.ui.text.style.TextAlign
 fun EditorScreen(
     modifier: Modifier = Modifier,
     viewModel: NotesViewModel,
+    settingsViewModel: SettingsViewModel,
     noteId: Long,
     onBack: () -> Unit
 ) {
     val activeNote by viewModel.activeNote.collectAsState()
+    val showWordCount by settingsViewModel.showWordCount.collectAsState()
+    val autosaveEnabled by settingsViewModel.autosaveEnabled.collectAsState()
+
 
     // 1) Load the requested note whenever noteId changes
     LaunchedEffect(noteId) {
@@ -93,11 +97,14 @@ fun EditorScreen(
                 onValueChange = { newTitle ->
                     title = newTitle
 
-                    // Only autosave if we are editing the correct loaded note
-                    val n = activeNote
-                    if (n != null && n.id == noteId) {
-                        viewModel.onEditorChanged(n.copy(title = newTitle, content = content))
+                    if (autosaveEnabled) {
+                        // Only autosave if we are editing the correct loaded note
+                        val n = activeNote
+                        if (n != null && n.id == noteId) {
+                            viewModel.onEditorChanged(n.copy(title = newTitle, content = content))
+                        }
                     }
+
                 },
                 label = { Text("Title") },
                 modifier = Modifier.fillMaxWidth()
@@ -108,9 +115,11 @@ fun EditorScreen(
                 onValueChange = { newContent ->
                     content = newContent
 
-                    val n = activeNote
-                    if (n != null && n.id == noteId) {
-                        viewModel.onEditorChanged(n.copy(title = title, content = newContent))
+                    if (autosaveEnabled) {
+                        val n = activeNote
+                        if (n != null && n.id == noteId) {
+                            viewModel.onEditorChanged(n.copy(title = title, content = newContent))
+                        }
                     }
                 },
                 label = { Text("Note") },
@@ -118,12 +127,14 @@ fun EditorScreen(
                     .fillMaxWidth()
                     .weight(1f)
             )
+            if (showWordCount) {
+                Text(
+                    text = "Words: $wordCount",
+                    style = MaterialTheme.typography.bodySmall,
+                    modifier = Modifier.fillMaxWidth()
+                )
 
-            Text(
-                text = "Words: $wordCount",
-                style = MaterialTheme.typography.bodySmall,
-                modifier = Modifier.fillMaxWidth()
-            )
+            }
         }
     }
 }

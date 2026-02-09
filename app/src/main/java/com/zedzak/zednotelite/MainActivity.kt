@@ -168,6 +168,7 @@ fun AppRoot() {
 
                 EditorScreen(
                     viewModel = notesViewModel,
+                    settingsViewModel = settingsViewModel,
                     noteId = noteId,
                     onBack = { navController.popBackStack() }
                 )

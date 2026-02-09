@@ -47,6 +47,26 @@ class SettingsViewModel(
                 initialValue = SortDirection.DESC
             )
 
+    val showWordCount: StateFlow<Boolean> =
+        settings
+            .map { it.showWordCount }
+            .distinctUntilChanged()
+            .stateIn(
+                scope = viewModelScope,
+                started = SharingStarted.WhileSubscribed(5_000),
+                initialValue = false
+            )
+
+    val autosaveEnabled: StateFlow<Boolean> =
+        settings
+            .map { it.autosaveEnabled }
+            .distinctUntilChanged()
+            .stateIn(
+                scope = viewModelScope,
+                started = SharingStarted.WhileSubscribed(5_000),
+                initialValue = true
+            )
+
     fun setShowWordCount(enabled: Boolean) {
         viewModelScope.launch {
             repository.setShowWordCount(enabled)
