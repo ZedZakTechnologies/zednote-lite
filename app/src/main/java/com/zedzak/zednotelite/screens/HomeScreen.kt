@@ -35,8 +35,7 @@ import androidx.compose.material.icons.filled.PushPin
 import androidx.compose.material.icons.outlined.PushPin
 import androidx.compose.foundation.layout.Row
 import androidx.compose.ui.Alignment
-
-
+import androidx.compose.ui.text.style.TextOverflow
 
 
 @Composable
@@ -152,10 +151,17 @@ fun NoteRow(
     onClick: () -> Unit,
     onTogglePin: () -> Unit
 ) {
+    val cardColor =
+        if (note.isPinned)
+            MaterialTheme.colorScheme.primary.copy(alpha = 0.08f)
+        else
+            MaterialTheme.colorScheme.surface
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable(onClick = onClick)
+            .clickable(onClick = onClick),
+        colors = CardDefaults.cardColors(containerColor = cardColor)
     ) {
         Row(
             modifier = Modifier
@@ -172,8 +178,14 @@ fun NoteRow(
                     style = MaterialTheme.typography.titleMedium
                 )
                 Spacer(modifier = Modifier.height(4.dp))
+                //Text(
+                //    text = note.content.take(80),
+                //    style = MaterialTheme.typography.bodyMedium
+                //)
                 Text(
-                    text = note.content.take(80),
+                    text = note.content,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis,
                     style = MaterialTheme.typography.bodyMedium
                 )
             }
