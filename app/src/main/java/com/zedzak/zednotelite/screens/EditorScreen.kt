@@ -36,7 +36,7 @@ import androidx.compose.ui.text.style.TextAlign
 fun EditorScreen(
     modifier: Modifier = Modifier,
     viewModel: NotesViewModel,
-    noteId: String,
+    noteId: Long,
     onBack: () -> Unit
 ) {
     val activeNote by viewModel.activeNote.collectAsState()

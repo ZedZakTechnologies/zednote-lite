@@ -161,10 +161,10 @@ fun AppRoot() {
             composable(
                 route = Routes.EDITOR,
                 arguments = listOf(
-                    navArgument("noteId") { type = NavType.StringType }
+                    navArgument("noteId") { type = NavType.LongType }
                 )
             ) { backStackEntry ->
-                val noteId = backStackEntry.arguments?.getString("noteId") ?: return@composable
+                val noteId = backStackEntry.arguments?.getLong("noteId") ?: return@composable
 
                 EditorScreen(
                     viewModel = notesViewModel,

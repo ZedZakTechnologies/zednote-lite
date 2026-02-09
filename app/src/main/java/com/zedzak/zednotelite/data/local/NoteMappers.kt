@@ -9,7 +9,8 @@ fun NoteEntity.toModel(): Note =
         content = content,
         createdAt = if (createdAt == 0L) lastEditedAt else createdAt,
         lastEditedAt = lastEditedAt,
-        isDeleted = isDeleted
+        isDeleted = isDeleted,
+        isPinned = isPinned
     )
 
 fun Note.toEntity(): NoteEntity =
@@ -19,5 +20,6 @@ fun Note.toEntity(): NoteEntity =
         content = content,
         createdAt = createdAt,
         lastEditedAt = lastEditedAt,
-        isDeleted = isDeleted
+        isDeleted = isDeleted,
+        isPinned = isPinned
     )

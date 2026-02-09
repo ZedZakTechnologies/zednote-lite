@@ -6,21 +6,24 @@ import androidx.room.PrimaryKey
 @Entity(tableName = "notes")
 data class NoteEntity(
     @PrimaryKey
-    val id: String,
+    val id: Long,
     val title: String,
     val content: String,
     val lastEditedAt: Long,
     val createdAt: Long,
-    val isDeleted: Boolean = false
+    val isDeleted: Boolean = false,
+    val isPinned: Boolean = false
+
 )
 
 
 fun NoteEntity.toNote() = Note(
-    id = id.toString(),
+    id = id.toLong(),
     title = title,
     content = content,
     lastEditedAt = lastEditedAt,
     createdAt = if (createdAt == 0L) lastEditedAt else createdAt,
-    isDeleted = isDeleted
+    isDeleted = isDeleted,
+    isPinned = isPinned
 )
 

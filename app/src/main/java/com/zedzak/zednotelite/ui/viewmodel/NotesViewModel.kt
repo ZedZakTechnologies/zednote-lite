@@ -74,7 +74,14 @@ class NotesViewModel(
             searchQuery
         ) { notes, sortMode, sortDirection, query ->
 
-            val sorted = applySort(notes, sortMode, sortDirection)
+            val pinned = notes.filter { it.isPinned }
+            val unpinned = notes.filterNot { it.isPinned }
+
+            val sortedPinned = applySort(pinned, sortMode, sortDirection)
+            val sortedUnpinned = applySort(unpinned, sortMode, sortDirection)
+
+            val sorted = sortedPinned + sortedUnpinned
+
 
             if (query.isBlank()) {
                 sorted
@@ -115,9 +122,9 @@ class NotesViewModel(
        Navigation / lifecycle
        ----------------------------- */
 
-    fun createNewNote(): String {
+    fun createNewNote(): Long {
         val note = Note(
-            id = UUID.randomUUID().toString(),
+            id = System.currentTimeMillis(),
             title = "",
             content = "",
             lastEditedAt = System.currentTimeMillis(),
@@ -134,12 +141,17 @@ class NotesViewModel(
         return note.id
     }
 
-    fun openNote(noteId: String) {
-        _activeNote.value = null
+    fun openNote(noteId: Long) {
+        // If we already have this note (e.g. just created), don’t refetch
+        val current = _activeNote.value
+        if (current != null && current.id == noteId) return
+
         viewModelScope.launch {
             _activeNote.value = repository.getNoteById(noteId)
         }
     }
+
+
 
 
 
@@ -187,5 +199,23 @@ class NotesViewModel(
     fun updateSearchQuery(query: String) {
         _searchQuery.value = query
     }
+
+    fun togglePin(noteId: Long) {
+        Log.d("PIN_VM", "togglePin called for id=$noteId")
+
+        viewModelScope.launch {
+            val note = repository.getNoteById(noteId) ?: return@launch
+            Log.d("PIN_VM", "before update isPinned=${note?.isPinned}")
+
+            if (note == null) return@launch
+
+            if (note.isPinned) {
+                repository.unpinNote(noteId)
+            } else {
+                repository.pinNote(noteId)
+            }
+        }
+    }
+
 
 }

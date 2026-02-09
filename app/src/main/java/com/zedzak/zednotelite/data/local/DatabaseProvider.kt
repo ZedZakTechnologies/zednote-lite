@@ -16,7 +16,8 @@ object DatabaseProvider {
                 AppDatabase::class.java,
                 "zednote_db"
             )
-                .addMigrations(MIGRATION_5_6)
+                .addMigrations(MIGRATION_5_6,
+                    MIGRATION_6_7)
                 .fallbackToDestructiveMigration()
                 .build()
             INSTANCE = instance

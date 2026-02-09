@@ -31,6 +31,10 @@ import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Text
 import com.zedzak.zednotelite.model.NoteSortMode
 import com.zedzak.zednotelite.ui.settings.SettingsViewModel
+import androidx.compose.material.icons.filled.PushPin
+import androidx.compose.material.icons.outlined.PushPin
+import androidx.compose.foundation.layout.Row
+import androidx.compose.ui.Alignment
 
 
 
@@ -40,7 +44,7 @@ fun HomeScreen(
     viewModel: NotesViewModel,
     settingsViewModel: SettingsViewModel,
     onOpenEditor: () -> Unit,
-    onOpenNote: (String) -> Unit,
+    onOpenNote: (Long) -> Unit,
     onOpenSettings: () -> Unit,
     modifier: Modifier = Modifier
 )  {
@@ -127,7 +131,10 @@ fun HomeScreen(
                 items(notes) { note ->
                     NoteRow(
                         note = note,
-                        onClick = { onOpenNote(note.id) }
+                        onClick = { onOpenNote(note.id) },
+                        onTogglePin = {
+                            viewModel.togglePin(note.id)
+                        }
                     )
                 }
             }
@@ -142,23 +149,49 @@ fun HomeScreen(
 @Composable
 fun NoteRow(
     note: Note,
-    onClick: () -> Unit
+    onClick: () -> Unit,
+    onTogglePin: () -> Unit
 ) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .clickable(onClick = onClick)
     ) {
-        Column(modifier = Modifier.padding(12.dp)) {
-            Text(
-                text = note.title,
-                style = MaterialTheme.typography.titleMedium
-            )
-            Spacer(modifier = Modifier.height(4.dp))
-            Text(
-                text = note.content.take(80),
-                style = MaterialTheme.typography.bodyMedium
-            )
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(12.dp),
+            verticalAlignment = Alignment.Top
+        ) {
+
+            Column(
+                modifier = Modifier.weight(1f)
+            ) {
+                Text(
+                    text = note.title,
+                    style = MaterialTheme.typography.titleMedium
+                )
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(
+                    text = note.content.take(80),
+                    style = MaterialTheme.typography.bodyMedium
+                )
+            }
+
+            IconButton(
+                onClick = {
+                    onTogglePin()
+                }
+            ) {
+                Icon(
+                    imageVector =
+                        if (note.isPinned) Icons.Filled.PushPin
+                        else Icons.Outlined.PushPin,
+                    contentDescription = "Pin note"
+                )
+            }
+
         }
+
     }
 }

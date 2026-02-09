@@ -14,7 +14,7 @@ interface NoteDao {
     fun getAllNotes(): Flow<List<NoteEntity>>
 
     @Query("SELECT * FROM notes WHERE id = :id LIMIT 1")
-    suspend fun getNoteById(id: String): NoteEntity?
+    suspend fun getNoteById(id: Long): NoteEntity?
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertNote(note: NoteEntity)
@@ -25,8 +25,14 @@ interface NoteDao {
     @Delete
     suspend fun deleteNote(note: NoteEntity)
 
-    //@Query("DELETE FROM notes WHERE id = :id")
-    //suspend fun deleteNoteById(id)
+    @Query("UPDATE notes SET isPinned = 1 WHERE id = :noteId")
+    suspend fun pinNote(noteId: Long)
+
+    @Query("UPDATE notes SET isPinned = 0 WHERE id = :noteId")
+    suspend fun unpinNote(noteId: Long)
+
+    @Query("SELECT isPinned FROM notes WHERE id = :id")
+    suspend fun debugIsPinned(id: Long): Int?
 
 }
 
