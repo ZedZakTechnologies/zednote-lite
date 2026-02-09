@@ -74,28 +74,34 @@ class NotesViewModel(
             searchQuery
         ) { notes, sortMode, sortDirection, query ->
 
-            val pinned = notes.filter { it.isPinned }
-            val unpinned = notes.filterNot { it.isPinned }
+            // 1️⃣ Apply search FIRST
+            val searched =
+                if (query.isBlank()) {
+                    notes
+                } else {
+                    notes.filter {
+                        it.title.contains(query, ignoreCase = true) ||
+                                it.content.contains(query, ignoreCase = true)
+                    }
+                }
 
+            // 2️⃣ Split pinned / unpinned from SEARCHED set
+            val pinned = searched.filter { it.isPinned }
+            val unpinned = searched.filterNot { it.isPinned }
+
+            // 3️⃣ Sort each group independently
             val sortedPinned = applySort(pinned, sortMode, sortDirection)
             val sortedUnpinned = applySort(unpinned, sortMode, sortDirection)
 
-            val sorted = sortedPinned + sortedUnpinned
+            // 4️⃣ Merge (pinned always first)
+            sortedPinned + sortedUnpinned
+        }
+            .stateIn(
+                scope = viewModelScope,
+                started = SharingStarted.WhileSubscribed(5_000),
+                initialValue = emptyList()
+            )
 
-
-            if (query.isBlank()) {
-                sorted
-            } else {
-                sorted.filter {
-                    it.title.contains(query, ignoreCase = true) ||
-                            it.content.contains(query, ignoreCase = true)
-                }
-            }
-        }.stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5_000),
-            initialValue = emptyList()
-        )
 
 
 
