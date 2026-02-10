@@ -147,26 +147,38 @@ fun HomeScreen(
             Text("New Note")
         }
 
-        if (notes.isEmpty() && searchQuery.isBlank()) {
-            Text(
-                text = "No notes yet",
-                style = MaterialTheme.typography.bodyMedium
-            )
-        } else {
-            LazyColumn(
-                verticalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                items(notes) { note ->
-                    NoteRow(
-                        note = note,
-                        onClick = { onOpenNote(note.id) },
-                        onTogglePin = {
-                            viewModel.togglePin(note.id)
-                        }
-                    )
+        when {
+            notes.isEmpty() && searchQuery.isBlank() -> {
+                Text(
+                    text = "No notes yet",
+                    style = MaterialTheme.typography.bodyMedium
+                )
+            }
+
+            notes.isEmpty() && searchQuery.isNotBlank() -> {
+                Text(
+                    text = "No results found",
+                    style = MaterialTheme.typography.bodyMedium
+                )
+            }
+
+            else -> {
+                LazyColumn(
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    items(notes) { note ->
+                        NoteRow(
+                            note = note,
+                            onClick = { onOpenNote(note.id) },
+                            onTogglePin = {
+                                viewModel.togglePin(note.id)
+                            }
+                        )
+                    }
                 }
             }
         }
+
 
     }
 
