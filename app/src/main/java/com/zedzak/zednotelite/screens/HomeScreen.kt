@@ -147,7 +147,7 @@ fun HomeScreen(
             Text("New Note")
         }
 
-        if (notes.isEmpty()) {
+        if (notes.isEmpty() && searchQuery.isBlank()) {
             Text(
                 text = "No notes yet",
                 style = MaterialTheme.typography.bodyMedium
@@ -167,6 +167,7 @@ fun HomeScreen(
                 }
             }
         }
+
     }
 
 
