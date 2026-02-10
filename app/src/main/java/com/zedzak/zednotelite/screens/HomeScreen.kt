@@ -37,6 +37,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.text.style.TextOverflow
 import com.zedzak.zednotelite.model.SortDirection
+import androidx.compose.material.icons.filled.Check
 
 
 @Composable
@@ -92,13 +93,28 @@ fun HomeScreen(
             ) {
                 DropdownMenuItem(
                     text = {
-                        Text(
-                            sortLabel(
-                                label = "Last edited",
-                                isActive = sortMode == NoteSortMode.LAST_EDITED,
-                                direction = sortDirection
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            if (sortMode == NoteSortMode.LAST_EDITED) {
+                                Icon(
+                                    imageVector = Icons.Default.Check,
+                                    contentDescription = null,
+                                    modifier = Modifier
+                                        .size(18.dp)
+                                        .padding(end = 6.dp),
+                                    tint = MaterialTheme.colorScheme.primary
+                                )
+                            }
+
+                            Text(
+                                text = sortLabel(
+                                    label = "Last Edited",
+                                    isActive = sortMode == NoteSortMode.LAST_EDITED,
+                                    direction = sortDirection
+                                )
                             )
-                        )
+                        }
                     },
                     onClick = {
                         settingsViewModel.onSortModeSelected(NoteSortMode.LAST_EDITED)
@@ -108,13 +124,28 @@ fun HomeScreen(
 
                 DropdownMenuItem(
                     text = {
-                        Text(
-                            sortLabel(
-                                label = "Created date",
-                                isActive = sortMode == NoteSortMode.CREATED_DATE,
-                                direction = sortDirection
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            if (sortMode == NoteSortMode.CREATED_DATE) {
+                                Icon(
+                                    imageVector = Icons.Default.Check,
+                                    contentDescription = null,
+                                    modifier = Modifier
+                                        .size(18.dp)
+                                        .padding(end = 6.dp),
+                                    tint = MaterialTheme.colorScheme.primary
+                                )
+                            }
+
+                            Text(
+                                text = sortLabel(
+                                    label = "Created Date",
+                                    isActive = sortMode == NoteSortMode.CREATED_DATE,
+                                    direction = sortDirection
+                                )
                             )
-                        )
+                        }
                     },
                     onClick = {
                         settingsViewModel.onSortModeSelected(NoteSortMode.CREATED_DATE)
@@ -122,15 +153,31 @@ fun HomeScreen(
                     }
                 )
 
+
                 DropdownMenuItem(
                     text = {
-                        Text(
-                            sortLabel(
-                                label = "Title",
-                                isActive = sortMode == NoteSortMode.TITLE,
-                                direction = sortDirection
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            if (sortMode == NoteSortMode.TITLE) {
+                                Icon(
+                                    imageVector = Icons.Default.Check,
+                                    contentDescription = null,
+                                    modifier = Modifier
+                                        .size(18.dp)
+                                        .padding(end = 6.dp),
+                                    tint = MaterialTheme.colorScheme.primary
+                                )
+                            }
+
+                            Text(
+                                text = sortLabel(
+                                    label = "Title",
+                                    isActive = sortMode == NoteSortMode.TITLE,
+                                    direction = sortDirection
+                                )
                             )
-                        )
+                        }
                     },
                     onClick = {
                         settingsViewModel.onSortModeSelected(NoteSortMode.TITLE)
