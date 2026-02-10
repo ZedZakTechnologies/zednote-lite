@@ -36,6 +36,7 @@ import androidx.compose.material.icons.outlined.PushPin
 import androidx.compose.foundation.layout.Row
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.text.style.TextOverflow
+import com.zedzak.zednotelite.model.SortDirection
 
 
 @Composable
@@ -48,8 +49,9 @@ fun HomeScreen(
     modifier: Modifier = Modifier
 )  {
     val notes by viewModel.visibleNotes.collectAsState()
-
     val searchQuery by viewModel.searchQuery.collectAsState()
+    val sortMode by settingsViewModel.sortMode.collectAsState()
+    val sortDirection by settingsViewModel.sortDirection.collectAsState()
 
 
     Column(
@@ -89,26 +91,53 @@ fun HomeScreen(
                 onDismissRequest = { sortMenuExpanded = false }
             ) {
                 DropdownMenuItem(
-                    text = { Text("Last edited") },
+                    text = {
+                        Text(
+                            sortLabel(
+                                label = "Last edited",
+                                isActive = sortMode == NoteSortMode.LAST_EDITED,
+                                direction = sortDirection
+                            )
+                        )
+                    },
                     onClick = {
                         settingsViewModel.onSortModeSelected(NoteSortMode.LAST_EDITED)
                         sortMenuExpanded = false
                     }
                 )
+
                 DropdownMenuItem(
-                    text = { Text("Created date") },
+                    text = {
+                        Text(
+                            sortLabel(
+                                label = "Created date",
+                                isActive = sortMode == NoteSortMode.CREATED_DATE,
+                                direction = sortDirection
+                            )
+                        )
+                    },
                     onClick = {
                         settingsViewModel.onSortModeSelected(NoteSortMode.CREATED_DATE)
                         sortMenuExpanded = false
                     }
                 )
+
                 DropdownMenuItem(
-                    text = { Text("Title") },
+                    text = {
+                        Text(
+                            sortLabel(
+                                label = "Title",
+                                isActive = sortMode == NoteSortMode.TITLE,
+                                direction = sortDirection
+                            )
+                        )
+                    },
                     onClick = {
                         settingsViewModel.onSortModeSelected(NoteSortMode.TITLE)
                         sortMenuExpanded = false
                     }
                 )
+
             }
         }
         Button(
@@ -144,6 +173,14 @@ fun HomeScreen(
 
 }
 
+private fun sortLabel(
+    label: String,
+    isActive: Boolean,
+    direction: SortDirection
+): String {
+    return if (!isActive) label
+    else "$label ${if (direction == SortDirection.ASC) "▲" else "▼"}"
+}
 
 @Composable
 fun NoteRow(
