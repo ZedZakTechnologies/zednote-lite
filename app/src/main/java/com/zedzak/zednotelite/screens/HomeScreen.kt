@@ -73,7 +73,7 @@ fun HomeScreen(
                 viewModel.updateSearchQuery(text)
             },
             modifier = Modifier.fillMaxWidth(),
-            placeholder = { Text("Search notes") },
+            placeholder = { Text("Search Notes") },
             singleLine = true
         )
 

@@ -39,7 +39,7 @@ fun SettingsScreen(
                 .padding(16.dp)
         ) {
             SettingToggle(
-                title = "Show word count",
+                title = "Show Word Count",
                 checked = settings.showWordCount,
                 onCheckedChange = viewModel::setShowWordCount
             )
@@ -47,7 +47,7 @@ fun SettingsScreen(
             Spacer(modifier = Modifier.height(12.dp))
 
             SettingToggle(
-                title = "Autosave enabled",
+                title = "Autosave Enabled",
                 checked = settings.autosaveEnabled,
                 onCheckedChange = viewModel::setAutosaveEnabled
             )
