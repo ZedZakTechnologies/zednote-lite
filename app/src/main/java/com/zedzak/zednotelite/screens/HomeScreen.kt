@@ -295,14 +295,14 @@ fun NoteRow(
                         imageVector =
                             if (note.isPinned) Icons.Filled.PushPin
                             else Icons.Outlined.PushPin,
-                        contentDescription = "Pin note"
+                        contentDescription = "Pin Note"
                     )
                 }
 
                 IconButton(onClick = { menuExpanded = true }) {
                     Icon(
                         imageVector = Icons.Default.MoreVert,
-                        contentDescription = "More options"
+                        contentDescription = "More Options"
                     )
                 }
 
