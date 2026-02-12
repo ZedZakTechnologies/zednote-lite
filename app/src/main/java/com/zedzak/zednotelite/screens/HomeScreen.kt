@@ -38,6 +38,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.text.style.TextOverflow
 import com.zedzak.zednotelite.model.SortDirection
 import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.MoreVert
 
 
 @Composable
@@ -216,10 +217,10 @@ fun HomeScreen(
                         NoteRow(
                             note = note,
                             onClick = { onOpenNote(note.id) },
-                            onTogglePin = {
-                                viewModel.togglePin(note.id)
-                            }
+                            onTogglePin = { viewModel.togglePin(note.id) },
+                            onDelete = { viewModel.deleteNote(it) }
                         )
+
                     }
                 }
             }
@@ -245,8 +246,12 @@ private fun sortLabel(
 fun NoteRow(
     note: Note,
     onClick: () -> Unit,
-    onTogglePin: () -> Unit
+    onTogglePin: () -> Unit,
+    onDelete: (Note) -> Unit
 ) {
+    var menuExpanded by remember { mutableStateOf(false) }
+    var showDeleteDialog by remember { mutableStateOf(false) }
+
     val cardColor =
         if (note.isPinned)
             MaterialTheme.colorScheme.primary.copy(alpha = 0.08f)
@@ -273,11 +278,9 @@ fun NoteRow(
                     text = note.title,
                     style = MaterialTheme.typography.titleMedium
                 )
+
                 Spacer(modifier = Modifier.height(4.dp))
-                //Text(
-                //    text = note.content.take(80),
-                //    style = MaterialTheme.typography.bodyMedium
-                //)
+
                 Text(
                     text = note.content,
                     maxLines = 2,
@@ -286,20 +289,62 @@ fun NoteRow(
                 )
             }
 
-            IconButton(
-                onClick = {
-                    onTogglePin()
+            Row {
+                IconButton(onClick = onTogglePin) {
+                    Icon(
+                        imageVector =
+                            if (note.isPinned) Icons.Filled.PushPin
+                            else Icons.Outlined.PushPin,
+                        contentDescription = "Pin note"
+                    )
                 }
-            ) {
-                Icon(
-                    imageVector =
-                        if (note.isPinned) Icons.Filled.PushPin
-                        else Icons.Outlined.PushPin,
-                    contentDescription = "Pin note"
-                )
+
+                IconButton(onClick = { menuExpanded = true }) {
+                    Icon(
+                        imageVector = Icons.Default.MoreVert,
+                        contentDescription = "More options"
+                    )
+                }
+
+                DropdownMenu(
+                    expanded = menuExpanded,
+                    onDismissRequest = { menuExpanded = false }
+                ) {
+                    DropdownMenuItem(
+                        text = { Text("Delete") },
+                        onClick = {
+                            menuExpanded = false
+                            showDeleteDialog = true
+                        }
+                    )
+                }
             }
-
         }
+    }
 
+    if (showDeleteDialog) {
+        AlertDialog(
+            onDismissRequest = { showDeleteDialog = false },
+            title = { Text("Delete Note?") },
+            text = { Text("This action cannot be undone.") },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        showDeleteDialog = false
+                        onDelete(note)
+                    }
+                ) {
+                    Text("Delete")
+                }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = { showDeleteDialog = false }
+                ) {
+                    Text("Cancel")
+                }
+            }
+        )
     }
 }
+

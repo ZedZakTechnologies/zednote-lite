@@ -17,10 +17,10 @@ import androidx.compose.runtime.derivedStateOf
 import com.zedzak.zednotelite.ui.viewmodel.NotesViewModel
 import com.zedzak.zednotelite.model.Note
 import androidx.compose.runtime.remember
-
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
+import androidx.compose.foundation.layout.imePadding
 
 
 import androidx.compose.foundation.gestures.detectTapGestures
@@ -89,6 +89,7 @@ fun EditorScreen(
             modifier = modifier
                 .fillMaxSize()
                 .padding(padding)
+                .imePadding()
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
